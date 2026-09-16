@@ -1,0 +1,307 @@
+@import "tailwindcss";
+@config "../../tailwind.config.js";
+
+/* ==========================================================================
+   Nova — Design tokens
+   Light is the primary theme. Dark is a purpose-built neutral palette with a
+   re-tuned orange (lighter, less saturated) so contrast holds on dark surfaces.
+   ========================================================================== */
+
+:root {
+  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, monospace;
+
+  /* Surfaces */
+  --c-canvas: 246 247 249;
+  --c-surface: 255 255 255;
+  --c-surface-2: 249 250 251;
+  --c-surface-3: 243 244 246;
+  --c-overlay: 15 18 24;
+
+  /* Lines */
+  --c-line: 229 231 235;
+  --c-line-strong: 209 213 219;
+
+  /* Text */
+  --c-ink: 22 24 29;
+  --c-ink-2: 82 88 100;
+  --c-ink-3: 130 137 149;
+  --c-ink-inv: 255 255 255;
+
+  /* Brand — orange */
+  --c-brand: 234 88 12;
+  --c-brand-hover: 217 79 8;
+  --c-brand-press: 194 65 12;
+  --c-brand-soft: 255 237 226;
+  --c-brand-softer: 255 246 240;
+  --c-brand-text: 194 65 12;
+  --c-brand-line: 253 205 174;
+
+  /* Status */
+  --c-success: 22 143 92;
+  --c-success-soft: 226 246 236;
+  --c-success-text: 16 110 71;
+  --c-warning: 202 138 4;
+  --c-warning-soft: 254 245 218;
+  --c-warning-text: 146 99 4;
+  --c-danger: 208 48 47;
+  --c-danger-hover: 185 40 39;
+  --c-danger-soft: 253 232 232;
+  --c-danger-text: 176 36 36;
+  --c-info: 37 99 235;
+  --c-info-soft: 231 239 254;
+  --c-info-text: 29 78 216;
+  --c-neutral-soft: 241 243 245;
+  --c-neutral-text: 82 88 100;
+
+  /* Charts */
+  --c-chart-1: 234 88 12;
+  --c-chart-2: 37 99 235;
+  --c-chart-3: 22 143 92;
+  --c-chart-4: 147 51 234;
+  --c-chart-5: 202 138 4;
+  --c-chart-6: 8 145 178;
+  --c-chart-grid: 233 236 239;
+  --c-chart-axis: 130 137 149;
+
+  --shadow-xs: 0 1px 2px 0 rgb(16 24 40 / 0.04);
+  --shadow-sm: 0 1px 3px 0 rgb(16 24 40 / 0.06), 0 1px 2px -1px rgb(16 24 40 / 0.04);
+  --shadow-md: 0 4px 10px -2px rgb(16 24 40 / 0.08), 0 2px 4px -2px rgb(16 24 40 / 0.05);
+  --shadow-lg: 0 12px 24px -6px rgb(16 24 40 / 0.12), 0 4px 8px -4px rgb(16 24 40 / 0.06);
+  --shadow-xl: 0 24px 48px -12px rgb(16 24 40 / 0.18), 0 8px 16px -8px rgb(16 24 40 / 0.08);
+}
+
+.dark {
+  --c-canvas: 12 14 17;
+  --c-surface: 22 25 30;
+  --c-surface-2: 28 32 38;
+  --c-surface-3: 35 40 47;
+  --c-overlay: 5 6 8;
+
+  --c-line: 42 47 55;
+  --c-line-strong: 58 64 74;
+
+  --c-ink: 237 239 242;
+  --c-ink-2: 158 165 176;
+  --c-ink-3: 120 128 140;
+  --c-ink-inv: 17 19 23;
+
+  /* Orange lifted for dark surfaces — keeps ~4.6:1 on canvas */
+  --c-brand: 249 122 47;
+  --c-brand-hover: 253 143 74;
+  --c-brand-press: 234 105 30;
+  --c-brand-soft: 60 33 16;
+  --c-brand-softer: 40 25 15;
+  --c-brand-text: 253 163 106;
+  --c-brand-line: 92 51 24;
+
+  --c-success: 52 179 122;
+  --c-success-soft: 18 48 36;
+  --c-success-text: 94 205 150;
+  --c-warning: 226 168 43;
+  --c-warning-soft: 55 42 12;
+  --c-warning-text: 240 191 84;
+  --c-danger: 235 90 88;
+  --c-danger-hover: 244 112 110;
+  --c-danger-soft: 58 26 26;
+  --c-danger-text: 246 133 131;
+  --c-info: 89 141 250;
+  --c-info-soft: 23 36 66;
+  --c-info-text: 138 173 253;
+  --c-neutral-soft: 35 40 47;
+  --c-neutral-text: 158 165 176;
+
+  --c-chart-1: 249 122 47;
+  --c-chart-2: 89 141 250;
+  --c-chart-3: 52 179 122;
+  --c-chart-4: 176 116 250;
+  --c-chart-5: 226 168 43;
+  --c-chart-6: 45 183 209;
+  --c-chart-grid: 40 45 53;
+  --c-chart-axis: 120 128 140;
+
+  --shadow-xs: 0 1px 2px 0 rgb(0 0 0 / 0.3);
+  --shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 0.4), 0 1px 2px -1px rgb(0 0 0 / 0.3);
+  --shadow-md: 0 4px 10px -2px rgb(0 0 0 / 0.45), 0 2px 4px -2px rgb(0 0 0 / 0.3);
+  --shadow-lg: 0 12px 24px -6px rgb(0 0 0 / 0.55), 0 4px 8px -4px rgb(0 0 0 / 0.35);
+  --shadow-xl: 0 24px 48px -12px rgb(0 0 0 / 0.65), 0 8px 16px -8px rgb(0 0 0 / 0.4);
+}
+
+@layer base {
+  * {
+    border-color: rgb(var(--c-line));
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  html[data-locale="fa"],
+  html[dir="rtl"] {
+    --font-sans: "Vazirmatn", "Inter", ui-sans-serif, system-ui, sans-serif;
+  }
+
+  body {
+    background-color: rgb(var(--c-canvas));
+    color: rgb(var(--c-ink));
+    font-family: var(--font-sans);
+    font-size: 14px;
+    line-height: 21px;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+
+  /* Theme transition — subtle, and only on the properties that change.
+     Suppressed while the user is actively toggling nothing else. */
+  body,
+  body * {
+    transition-property: background-color, border-color, color, fill, stroke;
+    transition-duration: 180ms;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  button {
+    cursor: pointer;
+  }
+
+  /* Never animate on first paint or during layout-driven changes */
+  .no-theme-transition,
+  .no-theme-transition * {
+    transition: none !important;
+  }
+
+  /* Tabular numerals everywhere numbers matter for scanning */
+  .tnum,
+  table td,
+  table th {
+    font-variant-numeric: tabular-nums;
+  }
+
+  :focus-visible {
+    outline: 2px solid rgb(var(--c-brand));
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+
+  ::selection {
+    background: rgb(var(--c-brand) / 0.22);
+  }
+
+  /* Scrollbars */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: rgb(var(--c-line-strong)) transparent;
+  }
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background-color: rgb(var(--c-line-strong));
+    border-radius: 999px;
+    border: 3px solid transparent;
+    background-clip: content-box;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background-color: rgb(var(--c-ink-3));
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
+
+@layer components {
+  .skeleton {
+    position: relative;
+    overflow: hidden;
+    background-color: rgb(var(--c-surface-3));
+    border-radius: 6px;
+  }
+  .skeleton::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    transform: translateX(-100%);
+    background-image: linear-gradient(90deg, transparent, rgb(var(--c-surface) / 0.6), transparent);
+    animation: shimmer 1.6s infinite;
+  }
+  .dark .skeleton::after {
+    background-image: linear-gradient(90deg, transparent, rgb(255 255 255 / 0.05), transparent);
+  }
+
+  /* Card primitive */
+  .card {
+    background-color: rgb(var(--c-surface));
+    border: 1px solid rgb(var(--c-line));
+    border-radius: 12px;
+  }
+
+  .sr-only-focusable:not(:focus):not(:focus-within) {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+  }
+}
+
+/* Recharts theming hooks */
+.recharts-cartesian-grid line {
+  stroke: rgb(var(--c-chart-grid));
+}
+.recharts-text {
+  fill: rgb(var(--c-chart-axis));
+  font-size: 12px;
+}
+.recharts-cartesian-axis-line,
+.recharts-cartesian-axis-tick-line {
+  stroke: transparent;
+}
+.recharts-surface:focus {
+  outline: none;
+}
+
+/* Swiper — match Nova controls, not default blue */
+.nova-gallery .swiper {
+  height: 100%;
+}
+.nova-gallery .swiper-button-next,
+.nova-gallery .swiper-button-prev {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: rgb(var(--c-surface) / 0.95);
+  border: 1px solid rgb(var(--c-line-strong));
+  color: rgb(var(--c-ink));
+  box-shadow: var(--shadow-xs);
+}
+.nova-gallery .swiper-button-next::after,
+.nova-gallery .swiper-button-prev::after {
+  font-size: 12px;
+  font-weight: 700;
+}
+.nova-gallery .swiper-pagination-bullet {
+  background: rgb(var(--c-ink-3));
+  opacity: 0.5;
+}
+.nova-gallery .swiper-pagination-bullet-active {
+  background: rgb(var(--c-brand));
+  opacity: 1;
+}
+.nova-gallery-thumbs .swiper-slide {
+  height: auto;
+}

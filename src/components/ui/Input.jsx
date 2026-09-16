@@ -1,0 +1,94 @@
+'use client';
+
+import { forwardRef, useId } from 'react';
+import { AlertCircle } from 'lucide-react';
+import { cn } from '@/lib/format';
+
+export const fieldBase =
+  'w-full rounded-control border bg-surface text-ink placeholder:text-ink-3 ' +
+  'transition-[border-color,box-shadow,background-color] duration-150 ' +
+  'focus:outline-none focus:border-brand focus:ring-[3px] focus:ring-brand/20 ' +
+  'disabled:cursor-not-allowed disabled:bg-surface-3 disabled:text-ink-3';
+
+export function FieldShell({ label, htmlFor, required, hint, error, children, className, action }) {
+  return (
+    <div className={cn('flex flex-col gap-1.5', className)}>
+      {label && (
+        <div className="flex items-baseline justify-between gap-2">
+          <label htmlFor={htmlFor} className="text-body-sm font-medium text-ink">
+            {label}
+            {required && (
+              <span className="ml-0.5 text-danger-text" aria-hidden>
+                *
+              </span>
+            )}
+            {required && <span className="sr-only"> (required)</span>}
+          </label>
+          {action}
+        </div>
+      )}
+      {children}
+      {error ? (
+        <p className="flex items-start gap-1.5 text-caption text-danger-text">
+          <AlertCircle aria-hidden className="mt-px h-3.5 w-3.5 shrink-0" />
+          {error}
+        </p>
+      ) : hint ? (
+        <p className="text-caption text-ink-3">{hint}</p>
+      ) : null}
+    </div>
+  );
+}
+
+const Input = forwardRef(function Input(
+  { label, hint, error, required, className, wrapperClassName, prefix, suffix, icon: Icon, id, action, ...props },
+  ref
+) {
+  const autoId = useId();
+  const inputId = id || autoId;
+  const describedBy = error || hint ? `${inputId}-desc` : undefined;
+
+  return (
+    <FieldShell
+      label={label}
+      htmlFor={inputId}
+      required={required}
+      hint={hint}
+      error={error}
+      className={wrapperClassName}
+      action={action}
+    >
+      <div className="relative flex items-center">
+        {Icon && (
+          <Icon aria-hidden className="pointer-events-none absolute left-3 h-4 w-4 text-ink-3" />
+        )}
+        {prefix && (
+          <span className="pointer-events-none absolute left-3 text-body text-ink-3">{prefix}</span>
+        )}
+        <input
+          ref={ref}
+          id={inputId}
+          aria-invalid={error ? 'true' : undefined}
+          aria-describedby={describedBy}
+          aria-required={required || undefined}
+          className={cn(
+            fieldBase,
+            'h-9 px-3 text-body',
+            Icon && 'pl-9',
+            prefix && 'pl-7',
+            suffix && 'pr-10',
+            error ? 'border-danger focus:border-danger focus:ring-danger/20' : 'border-line-strong',
+            className
+          )}
+          {...props}
+        />
+        {suffix && (
+          <span className="pointer-events-none absolute right-3 text-caption text-ink-3">{suffix}</span>
+        )}
+      </div>
+      {(error || hint) && <span id={describedBy} className="sr-only">{error || hint}</span>}
+    </FieldShell>
+  );
+});
+
+export default Input;

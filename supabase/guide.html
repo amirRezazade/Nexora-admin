@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ساخت دیتابیس Nova روی Supabase</title>
+  <style>
+    :root {
+      --bg: #f4f1eb;
+      --paper: #fffdf8;
+      --ink: #1c1915;
+      --ink-2: #5a544b;
+      --ink-3: #8a8276;
+      --line: #e6dfd4;
+      --brand: #e85d04;
+      --brand-ink: #9a3412;
+      --brand-soft: #fff1e6;
+      --ok: #246b3a;
+      --ok-soft: #e7f6ec;
+      --warn-soft: #fff4dc;
+      --warn: #8a4b08;
+      --info-soft: #e7f0fb;
+      --info: #1d4e89;
+      --shadow: 0 1px 2px rgba(28,25,21,.05), 0 14px 36px rgba(28,25,21,.06);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Vazirmatn", "IRANSans", Tahoma, "Segoe UI", sans-serif;
+      background: radial-gradient(900px 420px at 100% -8%, #ffe7d2 0%, transparent 55%), var(--bg);
+      color: var(--ink);
+      line-height: 1.8;
+    }
+    .wrap { max-width: 920px; margin: 0 auto; padding: 36px 18px 80px; }
+    .hero, section {
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      box-shadow: var(--shadow);
+    }
+    .hero { padding: 28px; }
+    .kicker {
+      display: inline-block; background: var(--brand-soft); color: var(--brand-ink);
+      border-radius: 999px; padding: 3px 12px; font-size: 12px; font-weight: 700;
+    }
+    h1 { font-size: 30px; margin: 10px 0 8px; letter-spacing: -.03em; line-height: 1.3; }
+    h2 { font-size: 21px; margin: 0 0 10px; }
+    h3 { font-size: 16px; margin: 18px 0 8px; }
+    p { margin: 0 0 12px; }
+    .lede { color: var(--ink-2); max-width: 64ch; }
+    .pills { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+    .pill { background: #fff; border: 1px solid var(--line); border-radius: 999px; padding: 3px 10px; font-size: 12px; color: var(--ink-2); }
+    .pill b { color: var(--ink); }
+    nav.toc { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 18px 0 8px; }
+    @media (max-width: 640px) { nav.toc { grid-template-columns: 1fr; } }
+    nav.toc a {
+      text-decoration: none; color: var(--ink); background: var(--paper);
+      border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; font-size: 14px;
+    }
+    nav.toc a span { color: var(--brand); font-weight: 700; margin-left: 6px; }
+    section { padding: 24px; margin-top: 14px; }
+    ol.steps { padding: 0 22px 0 0; margin: 0; }
+    ol.steps > li { margin: 0 0 14px; }
+    .callout { border-radius: 12px; padding: 12px 14px; margin: 12px 0 0; font-size: 14px; }
+    .warn { background: var(--warn-soft); color: var(--warn); }
+    .ok { background: var(--ok-soft); color: var(--ok); }
+    .info { background: var(--info-soft); color: var(--info); }
+    code, kbd {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 12.5px;
+    }
+    code { background: #f3eee6; border-radius: 6px; padding: 1px 6px; direction: ltr; display: inline-block; }
+    pre {
+      direction: ltr; text-align: left; background: #1c1915; color: #f6f3ee;
+      border-radius: 12px; padding: 14px 16px; overflow: auto; font-size: 12.5px; line-height: 1.6; margin: 8px 0 0;
+    }
+    table { width: 100%; border-collapse: collapse; font-size: 13.5px; margin-top: 8px; }
+    th, td { text-align: right; border-bottom: 1px solid var(--line); padding: 8px 6px; vertical-align: top; }
+    th { color: var(--ink-3); font-size: 12px; font-weight: 600; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 12px; }
+    @media (max-width: 720px) { .grid-2 { grid-template-columns: 1fr; } }
+    .card { background: #fff; border: 1px solid var(--line); border-radius: 14px; padding: 14px; }
+    .card h3 { margin-top: 0; }
+    .muted { color: var(--ink-3); font-size: 13px; }
+    .er { width: 100%; margin-top: 8px; background: #fff; border: 1px solid var(--line); border-radius: 14px; }
+    footer { text-align: center; color: var(--ink-3); font-size: 13px; margin-top: 22px; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="hero">
+      <div class="kicker">Nova Store · مرحله‌به‌مرحله</div>
+      <h1>دیتابیس را روی Supabase این‌طور بساز</h1>
+      <p class="lede">
+        لازم نیست SQL را از صفر بلدی. حساب می‌سازی، دو فایل را در SQL Editor اجرا می‌کنی،
+        بعد جدول‌ها را با دیتای واقعی Nova می‌بینی. کل کار حدود ۱۵ دقیقه است.
+      </p>
+      <div class="pills">
+        <span class="pill"><b>۸</b> جدول + ۱ view</span>
+        <span class="pill"><b>۲۸</b> محصول</span>
+        <span class="pill"><b>۸۰</b> مشتری</span>
+        <span class="pill"><b>۱۵۰</b> سفارش</span>
+        <span class="pill"><b>۲۲۷</b> آیتم سفارش</span>
+      </div>
+    </header>
+
+    <nav class="toc">
+      <a href="#map"><span>۰</span> نقشه دیتابیس</a>
+      <a href="#account"><span>۱</span> ساخت حساب و پروژه</a>
+      <a href="#dashboard"><span>۲</span> داشبورد را بشناس</a>
+      <a href="#schema"><span>۳</span> اجرای schema.sql</a>
+      <a href="#seed"><span>۴</span> ریختن دیتا</a>
+      <a href="#check"><span>۵</span> چک کردن جدول‌ها</a>
+      <a href="#api"><span>۶</span> تست API</a>
+      <a href="#rls"><span>۷</span> RLS یعنی چه</a>
+    </nav>
+
+    <section id="map">
+      <h2>۰. اول بفهمیم چه چیزی می‌سازیم</h2>
+      <p>
+        Nova الان دیتایش را در حافظهٔ سرور Next نگه می‌دارد. ما همان مدل را به
+        <b>Postgres واقعی</b> منتقل می‌کنیم. هر جعبه یک جدول است. فلش یعنی رابطه.
+      </p>
+      <svg class="er" viewBox="0 0 860 340" role="img" aria-label="نقشه جداول Nova">
+        <rect width="860" height="340" fill="#fffdf8"/>
+        <g font-family="Tahoma, sans-serif" font-size="12" fill="#1c1915">
+          <rect x="40" y="30" width="150" height="54" rx="10" fill="#fff1e6" stroke="#e85d04"/>
+          <text x="115" y="52" text-anchor="middle" font-weight="700">categories</text>
+          <text x="115" y="70" text-anchor="middle" fill="#8a8276" font-size="11">۹ دسته</text>
+
+          <rect x="260" y="30" width="150" height="54" rx="10" fill="#fff" stroke="#e6dfd4"/>
+          <text x="335" y="52" text-anchor="middle" font-weight="700">products</text>
+          <text x="335" y="70" text-anchor="middle" fill="#8a8276" font-size="11">۲۸ محصول</text>
+
+          <rect x="480" y="30" width="150" height="54" rx="10" fill="#fff" stroke="#e6dfd4"/>
+          <text x="555" y="52" text-anchor="middle" font-weight="700">reviews</text>
+          <text x="555" y="70" text-anchor="middle" fill="#8a8276" font-size="11">۵۰ نظر</text>
+
+          <rect x="700" y="30" width="120" height="54" rx="10" fill="#e7f6ec" stroke="#246b3a"/>
+          <text x="760" y="52" text-anchor="middle" font-weight="700">inventory</text>
+          <text x="760" y="70" text-anchor="middle" fill="#8a8276" font-size="11">view</text>
+
+          <rect x="40" y="150" width="150" height="54" rx="10" fill="#fff" stroke="#e6dfd4"/>
+          <text x="115" y="172" text-anchor="middle" font-weight="700">customers</text>
+          <text x="115" y="190" text-anchor="middle" fill="#8a8276" font-size="11">۸۰ مشتری</text>
+
+          <rect x="260" y="150" width="150" height="54" rx="10" fill="#fff" stroke="#e6dfd4"/>
+          <text x="335" y="172" text-anchor="middle" font-weight="700">orders</text>
+          <text x="335" y="190" text-anchor="middle" fill="#8a8276" font-size="11">۱۵۰ سفارش</text>
+
+          <rect x="480" y="150" width="150" height="54" rx="10" fill="#fff" stroke="#e6dfd4"/>
+          <text x="555" y="172" text-anchor="middle" font-weight="700">order_items</text>
+          <text x="555" y="190" text-anchor="middle" fill="#8a8276" font-size="11">۲۲۷ خط</text>
+
+          <rect x="40" y="260" width="150" height="54" rx="10" fill="#fff" stroke="#e6dfd4"/>
+          <text x="115" y="282" text-anchor="middle" font-weight="700">coupons</text>
+          <text x="115" y="300" text-anchor="middle" fill="#8a8276" font-size="11">۸ کوپن</text>
+
+          <rect x="260" y="260" width="150" height="54" rx="10" fill="#fff" stroke="#e6dfd4"/>
+          <text x="335" y="282" text-anchor="middle" font-weight="700">notifications</text>
+          <text x="335" y="300" text-anchor="middle" fill="#8a8276" font-size="11">۱۷ پیام</text>
+        </g>
+        <g stroke="#c4b8a8" stroke-width="1.4" fill="none">
+          <path d="M190 57 H260"/>
+          <path d="M410 57 H480"/>
+          <path d="M410 40 H760 V30"/>
+          <path d="M190 177 H260"/>
+          <path d="M410 177 H480"/>
+          <path d="M335 84 V150"/>
+          <path d="M115 204 V260"/>
+        </g>
+      </svg>
+      <div class="grid-2">
+        <div class="card">
+          <h3>جدول واقعی</h3>
+          <p class="muted">محصول، مشتری، سفارش… هر ردیف یک موجودیت است. بینشان کلید خارجی می‌گذاریم تا سفارش بدون مشتری ساخته نشود.</p>
+        </div>
+        <div class="card">
+          <h3>view انبار</h3>
+          <p class="muted"><code>inventory</code> کپی جدا نیست. از روی <code>stock</code> محصول حساب می‌شود. اگر موجودی عوض شود، انبار هم عوض می‌شود.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="account">
+      <h2>۱. ساخت حساب و پروژه</h2>
+      <ol class="steps">
+        <li>برو به <b>https://supabase.com</b> و روی <b>Start your project</b> بزن.</li>
+        <li>با <b>GitHub</b> وارد شو (سریع‌ترین راه).</li>
+        <li>اگر سازمان خواست، همان <b>Personal</b> کافی است.</li>
+        <li>روی <b>New Project</b> بزن و این‌ها را پر کن:</li>
+      </ol>
+      <table>
+        <thead><tr><th>فیلد</th><th>چی بنویس</th></tr></thead>
+        <tbody>
+          <tr><td>Project name</td><td><code>nova-store</code></td></tr>
+          <tr><td>Database password</td><td>روی <b>Generate a password</b> بزن و همان لحظه کپی کن. این رمز دیتابیس است، نه رمز اکانت.</td></tr>
+          <tr><td>Region</td><td><b>Central EU (Frankfurt)</b> — به تو نزدیک‌تر است.</td></tr>
+          <tr><td>Plan</td><td><b>Free</b></td></tr>
+        </tbody>
+      </table>
+      <div class="callout warn">
+        ۱ تا ۲ دقیقه صبر کن تا پروژه Ready شود. تب را نبند.
+        رمز دیتابیس را در جای امن نگه دار؛ بعداً دوباره نشان داده نمی‌شود.
+      </div>
+    </section>
+
+    <section id="dashboard">
+      <h2>۲. داشبورد را بشناس</h2>
+      <p>از منوی سمت چپ فقط همین‌ها را لازم داری:</p>
+      <table>
+        <thead><tr><th>منو</th><th>برای چه</th></tr></thead>
+        <tbody>
+          <tr><td><b>Table Editor</b></td><td>دیدن و ویرایش ردیف‌ها مثل اکسل</td></tr>
+          <tr><td><b>SQL Editor</b></td><td>اجرای فایل‌هایی که برات آماده کردم</td></tr>
+          <tr><td><b>Database</b></td><td>ایندکس، foreign key، backup</td></tr>
+          <tr><td><b>Project Settings → API</b></td><td>آدرس پروژه و کلید <code>anon</code></td></tr>
+        </tbody>
+      </table>
+      <p class="muted">Auth و Storage را فعلاً دست نزن. اول دیتابیس را درست می‌کنیم.</p>
+    </section>
+
+    <section id="schema">
+      <h2>۳. ساخت جدول‌ها با schema.sql</h2>
+      <p>جدول‌های Nova ستون زیاد دارند. ساختن دستی‌شان خسته‌کننده و پرخطاست. یک اسکریپت همه را با رابطه می‌سازد.</p>
+      <ol class="steps">
+        <li>در سایدبار روی <b>SQL Editor</b> بزن.</li>
+        <li><b>New query</b> / <b>New snippet</b>.</li>
+        <li>محتوای فایل <code>nova/supabase/schema.sql</code> را کامل کپی و در ادیتور پیست کن.</li>
+        <li>پایین سمت راست (یا بالا) <b>Run</b> را بزن. میانبر معمولاً <kbd>Ctrl</kbd> + <kbd>Enter</kbd> است.</li>
+      </ol>
+      <div class="callout ok">
+        اگر موفق باشد پایین صفحه چیزی شبیه <b>Success. No rows returned</b> می‌بینی.
+        بعد برو <b>Table Editor</b>. باید این اسم‌ها را ببینی:
+        <code>categories</code> <code>customers</code> <code>products</code>
+        <code>coupons</code> <code>orders</code> <code>order_items</code>
+        <code>reviews</code> <code>notifications</code>
+        و view به اسم <code>inventory</code>.
+      </div>
+      <div class="callout warn">
+        اگر خطا دیدی، کل متن خطا را کپی کن. معمولاً یعنی فقط بخشی از فایل پیست شده.
+        <code>schema.sql</code> را از <code>begin;</code> تا <code>commit;</code> کامل اجرا کن.
+      </div>
+      <h3>این فایل چه کار می‌کند؟</h3>
+      <table>
+        <thead><tr><th>قسمت</th><th>معنی ساده</th></tr></thead>
+        <tbody>
+          <tr><td><code>create table products</code></td><td>جدول محصول با قیمت، موجودی، SKU</td></tr>
+          <tr><td><code>references categories(id)</code></td><td>هر محصول باید به یک دستهٔ موجود وصل باشد</td></tr>
+          <tr><td><code>check (price > 0)</code></td><td>قیمت صفر یا منفی ذخیره نمی‌شود</td></tr>
+          <tr><td><code>variants jsonb</code></td><td>سایز/رنگ‌ها داخل یک ستون JSON</td></tr>
+          <tr><td><code>create view inventory</code></td><td>انبار از روی موجودی محصول محاسبه می‌شود</td></tr>
+          <tr><td><code>enable row level security</code></td><td>قفل پیش‌فرض جدول‌ها؛ سیاست‌های دمو دسترسی را باز می‌کنند</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section id="seed">
+      <h2>۴. ریختن دیتای Nova</h2>
+      <p>جدول‌ها هنوز خالی‌اند. فایل <code>seed.sql</code> همان کاتالوگ Nova را وارد می‌کند (Nike Air Max 90، سفارش NV-13264 و بقیه).</p>
+      <ol class="steps">
+        <li>باز هم <b>SQL Editor → New query</b> (یک تب جدید، روی schema ننویس).</li>
+        <li>کل فایل <code>nova/supabase/seed.sql</code> را پیست کن.</li>
+        <li><b>Run</b>.</li>
+      </ol>
+      <p class="muted">این فایل حدود ۲۳۰ کیلوبایت است و چند ثانیه طول می‌کشد. Success یعنی دیتا نشسته.</p>
+      <div class="callout info">
+        ترتیب مهم است: اول <code>schema.sql</code>، بعد <code>seed.sql</code>.
+        اگر seed را دوباره اجرا کنی، اول truncate می‌کند و دوباره همان دیتا را می‌ریزد. بی‌خطر است.
+      </div>
+    </section>
+
+    <section id="check">
+      <h2>۵. ببین درست نشسته یا نه</h2>
+      <h3>الف) شمارش</h3>
+      <p>تب جدید SQL Editor، محتوای <code>nova/supabase/verify.sql</code> را Run کن. باید دقیقاً این عددها بیاید:</p>
+      <pre>categories      9
+customers      80
+products       28
+coupons         8
+orders        150
+order_items   227
+reviews        50
+notifications  17
+inventory      28</pre>
+
+      <h3>ب) Table Editor</h3>
+      <ol class="steps">
+        <li>برو <b>Table Editor → products</b>.</li>
+        <li>ردیف <code>prd-1001</code> را پیدا کن: <b>Nike Air Max 90</b>، موجودی <b>۳</b>، آستانه <b>۱۲</b>.</li>
+        <li>برو <b>orders</b> و <code>NV-13264</code> را باز کن: Bruno Moreno، وضعیت pending.</li>
+      </ol>
+
+      <h3>ج) چند کوئری برای فهمیدن دیتا</h3>
+      <p>هر کدام را جدا Run کن:</p>
+      <pre>-- محصولات کم‌موجود
+select name, sku, stock, threshold
+from products
+where stock &lt;= threshold
+order by stock;</pre>
+      <pre>-- سفارش‌های باز
+select id, customer_name, total, status
+from orders
+where status in ('pending','processing','shipped')
+order by placed_at desc;</pre>
+      <pre>-- پرفروش‌ها از روی آیتم‌ها
+select p.name, sum(i.quantity) as units, sum(i.total) as revenue
+from order_items i
+join products p on p.id = i.product_id
+group by p.name
+order by revenue desc
+limit 8;</pre>
+    </section>
+
+    <section id="api">
+      <h2>۶. تست API آمادهٔ Supabase</h2>
+      <p>داشبورد جدید دیگر صفحهٔ <b>Settings → API</b> با نوشتهٔ anon ندارد. دو مقدار را این‌طور پیدا کن.</p>
+
+      <h3>آسان‌ترین راه: دکمهٔ Connect</h3>
+      <ol class="steps">
+        <li>بالای صفحهٔ پروژه، دکمهٔ <b>Connect</b> را بزن (معمولاً کنار Project Settings).</li>
+        <li>تب <b>App Frameworks</b> یا <b>React</b> را باز کن.</li>
+        <li>دو مقدار را کپی کن:
+          <br/>• <b>Project URL</b> شبیه <code>https://abcdefgh.supabase.co</code>
+          <br/>• <b>Publishable key</b> که با <code>sb_publishable_</code> شروع می‌شود
+          (در پروژه‌های قدیمی ممکن است هنوز <code>anon</code> / <code>eyJ...</code> باشد)
+        </li>
+      </ol>
+
+      <h3>اگر Connect را ندیدی</h3>
+      <table>
+        <thead><tr><th>چی می‌خواهی</th><th>کجا</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>آدرس پروژه</td>
+            <td>
+              منوی چپ → <b>Integrations → Data API</b>
+              <br/>یا از URL مرورگر: اگر داشبورد این است
+              <code>supabase.com/dashboard/project/abcdefgh/...</code>
+              آدرس API می‌شود <code>https://abcdefgh.supabase.co</code>
+            </td>
+          </tr>
+          <tr>
+            <td>کلید</td>
+            <td>
+              آیکون چرخ‌دنده پایین سایدبار → <b>API Keys</b>
+              <br/>تب <b>API Keys</b> / Publishable key
+              <br/>اگر نبود: تب <b>Legacy API Keys</b> و کلید <b>anon</b>
+              <br/>اگر دکمهٔ <b>Create new API Keys</b> دیدی، بزن و Publishable را بردار.
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <p>در ترمینال (آدرس و کلید را جایگزین کن):</p>
+      <pre>curl "https://YOUR_PROJECT.supabase.co/rest/v1/products?select=id,name,sku,stock,status&amp;order=name" \
+  -H "apikey: YOUR_PUBLISHABLE_KEY" \
+  -H "Authorization: Bearer YOUR_PUBLISHABLE_KEY"</pre>
+      <p class="muted">
+        فیلتر: <code>status=eq.pending</code> یعنی مساوی.
+        اگر کلید جدید <code>sb_publishable_</code> است و خطای Invalid JWT گرفتی،
+        فقط هدر <code>apikey</code> را بفرست و Authorization را حذف کن.
+      </p>
+      <div class="callout warn">
+        کلید <b>secret</b> یا <b>service_role</b> را هیچ‌وقت در فرانت یا گیت نگذار.
+        فقط Publishable / anon را بردار.
+      </div>
+      <div class="callout info">
+        این قدم فقط برای تست است. اگر در Table Editor دیتا را می‌بینی، دیتابیس ساخته شده
+        و لازم نیست همین الان curl بزنی.
+      </div>
+    </section>
+
+    <section id="rls">
+      <h2>۷. RLS یعنی چه؟ (کوتاه)</h2>
+      <p>
+        Row Level Security قفل ردیف‌های جدول است. در Supabase جدول جدید به‌صورت پیش‌فرض قفل است؛
+        اگر سیاست ننویسی، API خالی برمی‌گرداند — حتی اگر در Table Editor دیتا را ببینی.
+      </p>
+      <p>
+        داخل <code>schema.sql</code> برای هر جدول یک سیاست دمو گذاشتم:
+        <code>for all using (true)</code> یعنی فعلاً خواندن و نوشتن برای کلید anon آزاد است.
+        برای پورتفولیو کافی است. وقتی Auth واقعی وصل شد، این سیاست‌ها را تنگ‌تر می‌کنیم.
+      </p>
+      <div class="callout ok">
+        تا اینجا دیتابیس ساخته شده. اپ Nova هنوز به آن وصل نیست و همان API داخلی خودش را دارد.
+        وصل کردن فرانت قدم بعدی است؛ اول همین را تا مرحلهٔ ۶ جلو ببر.
+      </div>
+      <h3>اگر چیزی خراب شد</h3>
+      <table>
+        <thead><tr><th>علامت</th><th>کار</th></tr></thead>
+        <tbody>
+          <tr><td>جدول‌ها نیامدند</td><td><code>schema.sql</code> را کامل دوباره Run کن. از اول drop می‌کند و می‌سازد.</td></tr>
+          <tr><td>عدد verify غلط است</td><td><code>seed.sql</code> را دوباره Run کن.</td></tr>
+          <tr><td>curl آرایه خالی <code>[]</code> می‌دهد</td><td>کلید anon اشتباه است، یا schema بدون قسمت RLS اجرا شده.</td></tr>
+          <tr><td>خطای foreign key در seed</td><td>یعنی schema ناقص است. اول schema، بعد seed.</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <footer>
+      فایل‌ها: <code>nova/supabase/schema.sql</code> · <code>seed.sql</code> · <code>verify.sql</code>
+    </footer>
+  </div>
+</body>
+</html>
