@@ -100,7 +100,7 @@ export default function NotificationsPage() {
               disabled={unread === 0}
               onClick={() => {
                 dispatch(markAllRead());
-                dispatch(toast.success('All notifications marked as read.'));
+                dispatch(toast.success(t('toast.markedRead')));
               }}
             >
               {t('notificationsPage.markAll')}

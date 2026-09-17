@@ -1,6 +1,7 @@
 'use client';
 
 import { ShoppingCart, Package, Star, Server, Mail } from 'lucide-react';
+import { useI18n } from '@/i18n/I18nProvider';
 import { useSettingsSection } from '@/lib/settingsStore';
 import SettingsLayout from '@/components/layout/SettingsLayout';
 import Card, { CardHeader, CardBody } from '@/components/ui/Card';
@@ -10,65 +11,66 @@ import Input from '@/components/ui/Input';
 
 const GROUPS = [
   {
-    title: 'Orders',
+    titleKey: 'settingsPages.grpOrders',
     icon: ShoppingCart,
     items: [
-      { id: 'order_new', label: 'New order placed', description: 'Every time a customer checks out.', on: true },
-      { id: 'order_cancelled', label: 'Order cancelled', description: 'Including auto-cancelled unpaid orders.', on: true },
-      { id: 'order_refund', label: 'Refund requested', description: 'When a customer asks for their money back.', on: true },
+      { id: 'order_new', labelKey: 'settingsPages.orderNew', hintKey: 'settingsPages.orderNewHint' },
+      { id: 'order_cancelled', labelKey: 'settingsPages.orderCancelled', hintKey: 'settingsPages.orderCancelledHint' },
+      { id: 'order_refund', labelKey: 'settingsPages.orderRefund', hintKey: 'settingsPages.orderRefundHint' },
     ],
   },
   {
-    title: 'Inventory',
+    titleKey: 'settingsPages.grpInventory',
     icon: Package,
     items: [
-      { id: 'stock_low', label: 'Low stock', description: 'A product reaches its reorder threshold.', on: true },
-      { id: 'stock_out', label: 'Out of stock', description: 'A product becomes unavailable to buy.', on: true },
-      { id: 'stock_restock', label: 'Restocked', description: 'Inventory is replenished.', on: false },
+      { id: 'stock_low', labelKey: 'settingsPages.stockLow', hintKey: 'settingsPages.stockLowHint' },
+      { id: 'stock_out', labelKey: 'settingsPages.stockOut', hintKey: 'settingsPages.stockOutHint' },
+      { id: 'stock_restock', labelKey: 'settingsPages.stockRestock', hintKey: 'settingsPages.stockRestockHint' },
     ],
   },
   {
-    title: 'Reviews',
+    titleKey: 'settingsPages.grpReviews',
     icon: Star,
     items: [
-      { id: 'review_new', label: 'New review', description: 'Any new customer review.', on: false },
-      { id: 'review_low', label: 'Low rating', description: 'A review of 2 stars or fewer.', on: true },
+      { id: 'review_new', labelKey: 'settingsPages.reviewNew', hintKey: 'settingsPages.reviewNewHint' },
+      { id: 'review_low', labelKey: 'settingsPages.reviewLow', hintKey: 'settingsPages.reviewLowHint' },
     ],
   },
   {
-    title: 'System',
+    titleKey: 'settingsPages.grpSystem',
     icon: Server,
     items: [
-      { id: 'sys_payout', label: 'Payouts', description: 'Scheduled and completed payouts.', on: true },
-      { id: 'sys_security', label: 'Security alerts', description: 'New sign-ins and password changes.', on: true },
-      { id: 'sys_product', label: 'Product updates', description: 'New Nova features and releases.', on: false },
+      { id: 'sys_payout', labelKey: 'settingsPages.sysPayout', hintKey: 'settingsPages.sysPayoutHint' },
+      { id: 'sys_security', labelKey: 'settingsPages.sysSecurity', hintKey: 'settingsPages.sysSecurityHint' },
+      { id: 'sys_product', labelKey: 'settingsPages.sysProduct', hintKey: 'settingsPages.sysProductHint' },
     ],
   },
 ];
 
 export default function NotificationSettingsPage() {
+  const { t } = useI18n();
   const { form, patch, setForm, dirty, setDirty, save } = useSettingsSection('notifications');
   const set = (id) => (v) => { setForm((s) => ({ ...s, [id]: v })); setDirty(true); };
 
   return (
     <SettingsLayout
-      title="Notifications"
-      description="Choose what Nova tells you about, and how."
+      title={t('settingsPages.notifyTitle')}
+      description={t('settingsPages.notifyHint')}
       dirty={dirty}
       onSave={save}
     >
       <Card>
-        <CardHeader title="Delivery" description="Where notifications are sent." />
+        <CardHeader title={t('settingsPages.delivery')} description={t('settingsPages.deliveryHint')} />
         <CardBody className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <Input label="Notification email" type="email" value={form.email} onChange={patch('email')} icon={Mail} />
+          <Input label={t('settingsPages.notifyEmail')} type="email" value={form.email} onChange={patch('email')} icon={Mail} />
           <Select
-            label="Digest frequency"
+            label={t('settingsPages.digest')}
             value={form.digest}
             onChange={patch('digest')}
             options={[
-              { value: 'realtime', label: 'Real time' },
-              { value: 'hourly', label: 'Hourly digest' },
-              { value: 'daily', label: 'Daily digest' },
+              { value: 'realtime', label: t('settingsPages.realtime') },
+              { value: 'hourly', label: t('settingsPages.hourly') },
+              { value: 'daily', label: t('settingsPages.daily') },
             ]}
           />
         </CardBody>
@@ -77,12 +79,12 @@ export default function NotificationSettingsPage() {
       {GROUPS.map((group) => {
         const Icon = group.icon;
         return (
-          <Card key={group.title}>
+          <Card key={group.titleKey}>
             <CardHeader
               title={
                 <span className="flex items-center gap-2">
                   <Icon aria-hidden className="h-4 w-4 text-ink-3" />
-                  {group.title}
+                  {t(group.titleKey)}
                 </span>
               }
             />
@@ -92,8 +94,8 @@ export default function NotificationSettingsPage() {
                   <Switch
                     checked={Boolean(form[item.id])}
                     onChange={set(item.id)}
-                    label={item.label}
-                    description={item.description}
+                    label={t(item.labelKey)}
+                    description={t(item.hintKey)}
                   />
                 </div>
               ))}

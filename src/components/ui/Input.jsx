@@ -10,6 +10,32 @@ export const fieldBase =
   'focus:outline-none focus:border-brand focus:ring-[3px] focus:ring-brand/20 ' +
   'disabled:cursor-not-allowed disabled:bg-surface-3 disabled:text-ink-3';
 
+/** Number-input spinner clicks focus the field and browsers scroll it into view. */
+export function restoreWindowScroll() {
+  const x = window.scrollX;
+  const y = window.scrollY;
+  const restore = () => {
+    if (window.scrollX !== x || window.scrollY !== y) window.scrollTo(x, y);
+  };
+  requestAnimationFrame(restore);
+  setTimeout(restore, 0);
+}
+
+export function numberFocusGuards() {
+  return {
+    onMouseDown(e) {
+      restoreWindowScroll();
+      if (document.activeElement !== e.currentTarget) {
+        e.preventDefault();
+        e.currentTarget.focus({ preventScroll: true });
+      }
+    },
+    onWheel(e) {
+      e.currentTarget.blur();
+    },
+  };
+}
+
 export function FieldShell({ label, htmlFor, required, hint, error, children, className, action }) {
   return (
     <div className={cn('flex flex-col gap-1.5', className)}>
@@ -41,7 +67,7 @@ export function FieldShell({ label, htmlFor, required, hint, error, children, cl
 }
 
 const Input = forwardRef(function Input(
-  { label, hint, error, required, className, wrapperClassName, prefix, suffix, icon: Icon, id, action, ...props },
+  { label, hint, error, required, className, wrapperClassName, prefix, suffix, icon: Icon, id, action, type, onMouseDown, onWheel, ...props },
   ref
 ) {
   const autoId = useId();
@@ -68,9 +94,24 @@ const Input = forwardRef(function Input(
         <input
           ref={ref}
           id={inputId}
+          type={type}
           aria-invalid={error ? 'true' : undefined}
           aria-describedby={describedBy}
           aria-required={required || undefined}
+          onMouseDown={(e) => {
+            onMouseDown?.(e);
+            if (type === 'number') {
+              restoreWindowScroll();
+              if (document.activeElement !== e.currentTarget) {
+                e.preventDefault();
+                e.currentTarget.focus({ preventScroll: true });
+              }
+            }
+          }}
+          onWheel={(e) => {
+            onWheel?.(e);
+            if (type === 'number') e.currentTarget.blur();
+          }}
           className={cn(
             fieldBase,
             'h-9 px-3 text-body',

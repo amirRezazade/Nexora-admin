@@ -72,9 +72,9 @@ export default function AppearanceSettingsPage() {
             value={preference}
             onChange={(v) => dispatch(setPreference(v))}
             options={[
-              { value: 'light', label: t('settingsPages.light'), description: t('header.light'), preview: <ThemePreview scheme="light" /> },
-              { value: 'dark', label: t('settingsPages.dark'), description: t('header.dark'), preview: <ThemePreview scheme="dark" /> },
-              { value: 'system', label: t('settingsPages.system'), description: t('header.system'), preview: <SplitPreview /> },
+              { value: 'light', label: t('settingsPages.light'), description: t('settingsPages.themeLightHint'), preview: <ThemePreview scheme="light" /> },
+              { value: 'dark', label: t('settingsPages.dark'), description: t('settingsPages.themeDarkHint'), preview: <ThemePreview scheme="dark" /> },
+              { value: 'system', label: t('settingsPages.system'), description: t('settingsPages.themeSystemHint'), preview: <SplitPreview /> },
             ]}
           />
         </CardBody>
@@ -90,8 +90,8 @@ export default function AppearanceSettingsPage() {
             options={[
               {
                 value: 'comfortable',
-                label: t('header.light') === 'Light' ? 'Comfortable' : 'راحت',
-                description: 'More breathing room between rows.',
+                label: t('settingsPages.comfortable'),
+                description: t('settingsPages.comfortableHint'),
                 preview: (
                   <span aria-hidden className="flex flex-col gap-2 rounded-control border border-line bg-surface-2 p-2.5">
                     {[1, 2, 3].map((i) => <span key={i} className="h-1.5 rounded-pill bg-line-strong" />)}
@@ -100,8 +100,8 @@ export default function AppearanceSettingsPage() {
               },
               {
                 value: 'compact',
-                label: t('header.light') === 'Light' ? 'Compact' : 'فشرده',
-                description: 'More rows visible at once.',
+                label: t('settingsPages.compact'),
+                description: t('settingsPages.compactHint'),
                 preview: (
                   <span aria-hidden className="flex flex-col gap-1 rounded-control border border-line bg-surface-2 p-2.5">
                     {[1, 2, 3, 4, 5].map((i) => <span key={i} className="h-1 rounded-pill bg-line-strong" />)}
@@ -115,15 +115,15 @@ export default function AppearanceSettingsPage() {
       </Card>
 
       <Card>
-        <CardHeader title="Accent colour" description="Nova uses orange to mark primary actions and active state." />
+        <CardHeader title={t('settingsPages.accent')} description={t('settingsPages.accentHint')} />
         <CardBody>
           <div className="flex flex-wrap items-center gap-4">
             <span className="flex items-center gap-2.5 rounded-card border border-brand bg-brand-softer px-3.5 py-2.5">
               <span aria-hidden className="h-5 w-5 rounded-full bg-brand ring-2 ring-brand/25 ring-offset-2 ring-offset-brand-softer" />
-              <span className="text-body-sm font-medium text-brand-text">Nova Orange</span>
+              <span className="text-body-sm font-medium text-brand-text">{t('settingsPages.accentName')}</span>
             </span>
             <p className="max-w-xs text-caption leading-relaxed text-ink-3">
-              The accent is fixed to keep Nova recognisable across every store.
+              {t('settingsPages.accentBody')}
             </p>
           </div>
         </CardBody>

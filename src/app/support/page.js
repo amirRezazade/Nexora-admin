@@ -25,7 +25,7 @@ const FAQS = [
   },
   {
     q: 'What does the low-stock threshold do?',
-    a: 'When a product’s available quantity drops to or below its threshold, Nova flags it as low stock on the dashboard, raises a notification, and surfaces it in the Inventory low-stock filter. It does not stop customers buying.',
+    a: 'When a product’s available quantity drops to or below its threshold, Nexora flags it as low stock on the dashboard, raises a notification, and surfaces it in the Inventory low-stock filter. It does not stop customers buying.',
   },
   {
     q: 'Can I export my data?',
@@ -33,7 +33,7 @@ const FAQS = [
   },
   {
     q: 'How do refunds work?',
-    a: 'Open the order, choose More → Cancel order for unfulfilled orders, or mark it as refunded once you have processed the return through your payment provider. Nova records the status change in the order activity log.',
+    a: 'Open the order, choose More → Cancel order for unfulfilled orders, or mark it as refunded once you have processed the return through your payment provider. Nexora records the status change in the order activity log.',
   },
   {
     q: 'Why can’t I delete a category?',
@@ -69,7 +69,7 @@ export default function SupportPage() {
     await new Promise((r) => setTimeout(r, 900));
     setSending(false);
     setValues({ subject: '', topic: 'general', message: '' });
-    dispatch(toast.success('Message sent.', 'Our team usually replies within one business day.'));
+    dispatch(toast.success(t('toast.messageSent'), t('toast.messageSentHint')));
   };
 
   return (

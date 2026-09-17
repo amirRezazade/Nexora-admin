@@ -93,7 +93,7 @@ export default function OrdersPage() {
   };
 
   const exportOrders = (rows, label) => {
-    downloadCSV(`nova-orders-${new Date().toISOString().slice(0, 10)}.csv`, rows, [
+    downloadCSV(`nexora-orders-${new Date().toISOString().slice(0, 10)}.csv`, rows, [
       { header: 'Order ID', value: (r) => r.id },
       { header: 'Customer', value: (r) => r.customerName },
       { header: 'Email', value: (r) => r.customerEmail },
@@ -108,15 +108,15 @@ export default function OrdersPage() {
       { header: 'Method', value: (r) => r.paymentMethod },
       { header: 'Status', value: (r) => ORDER_STATUS[r.status]?.label },
     ]);
-    dispatch(toast.success('Export ready', `${rows.length} ${label} exported as CSV.`));
+    dispatch(toast.success(t('toast.exportReady'), t('toast.exportedCsv', { n: rows.length, label })));
   };
 
   const setStatusFor = async (order, next) => {
     try {
       await dispatch(updateOrderStatus({ id: order.id, status: next })).unwrap();
-      dispatch(toast.success('Order updated', `#${order.id} is now ${ORDER_STATUS[next].label.toLowerCase()}.`));
+      dispatch(toast.success(t('toast.orderUpdated'), t('toast.orderNow', { id: order.id, status: t(`status.${next}`) })));
     } catch {
-      dispatch(toast.error('We couldn’t update the order.', 'Please try again.'));
+      dispatch(toast.error(t('toast.orderUpdateError'), t('common.tryAgain')));
     }
   };
 
@@ -169,7 +169,7 @@ export default function OrdersPage() {
                         items.filter((i) => selected.includes(i.id)).map((o) => dispatch(updateOrderStatus({ id: o.id, status: s })))
                       );
                       dispatch(clearSelection());
-                      dispatch(toast.success(`${selected.length} order${selected.length === 1 ? '' : 's'} marked as ${ORDER_STATUS[s].label.toLowerCase()}.`));
+                      dispatch(toast.success(t('toast.orderBulk', { n: selected.length, status: t(`status.${s}`) })));
                     }}
                   >
                     Mark as {ORDER_STATUS[s].label.toLowerCase()}
@@ -177,7 +177,7 @@ export default function OrdersPage() {
                 ))
               }
             </Dropdown>
-            <Button size="sm" variant="secondary" icon={Printer} onClick={() => dispatch(toast.info('Printing is not available in this demo.'))}>
+            <Button size="sm" variant="secondary" icon={Printer} onClick={() => dispatch(toast.info(t('toast.printDemo')))}>
               Print
             </Button>
           </BulkBar>
@@ -334,7 +334,7 @@ export default function OrdersPage() {
                               <MenuItem icon={Eye} onClick={() => { close(); router.push(`/orders/${o.id}`); }}>
                                 {t('common.viewDetails')}
                               </MenuItem>
-                              <MenuItem icon={Printer} onClick={() => { close(); dispatch(toast.info('Printing is not available in this demo.')); }}>
+                              <MenuItem icon={Printer} onClick={() => { close(); dispatch(toast.info(t('toast.printDemo'))); }}>
                                 {t('common.printInvoice')}
                               </MenuItem>
                               <MenuSeparator />

@@ -8,7 +8,7 @@ import Card, { CardHeader, CardBody } from '@/components/ui/Card';
 import Input from '@/components/ui/Input';
 import Select from '@/components/ui/Select';
 import Button from '@/components/ui/Button';
-import { NovaMark } from '@/components/layout/Sidebar';
+import NexoraLogo from '@/components/brand/NexoraLogo';
 
 export default function StoreSettingsPage() {
   const { t } = useI18n();
@@ -16,18 +16,18 @@ export default function StoreSettingsPage() {
   return (
     <SettingsLayout title={t('settings.store')} description={t('settingsPages.branding')} dirty={dirty} onSave={save}>
       <Card>
-        <CardHeader title="Branding" description="Used across your storefront, emails and invoices." />
+        <CardHeader title={t('settingsPages.branding')} description={t('settingsPages.brandingHint')} />
         <CardBody className="flex flex-col gap-6">
           <div className="flex flex-wrap items-center gap-5">
-            <div className="flex h-20 w-20 items-center justify-center rounded-card-lg border border-line bg-surface-2">
-              <NovaMark className="h-12 w-12 rounded-card" />
+            <div className="flex h-20 w-20 items-center justify-center overflow-hidden rounded-card-lg border border-line bg-surface-2">
+              <NexoraLogo compact />
             </div>
             <div>
-              <p className="text-body-sm font-medium text-ink">Store logo</p>
-              <p className="mt-0.5 text-caption text-ink-3">PNG or SVG, at least 256×256px.</p>
+              <p className="text-body-sm font-medium text-ink">{t('settingsPages.storeLogo')}</p>
+              <p className="mt-0.5 text-caption text-ink-3">{t('settingsPages.logoHint')}</p>
               <div className="mt-2.5 flex gap-2">
-                <Button size="sm" variant="secondary" icon={Upload}>Upload logo</Button>
-                <Button size="sm" variant="ghost">Remove</Button>
+                <Button size="sm" variant="secondary" icon={Upload}>{t('settingsPages.uploadLogo')}</Button>
+                <Button size="sm" variant="ghost">{t('settingsPages.remove')}</Button>
               </div>
             </div>
           </div>
@@ -37,31 +37,31 @@ export default function StoreSettingsPage() {
               <ImageIcon aria-hidden className="h-5 w-5 text-ink-3" />
             </div>
             <div>
-              <p className="text-body-sm font-medium text-ink">Favicon</p>
-              <p className="mt-0.5 text-caption text-ink-3">32×32px ICO or PNG.</p>
-              <Button size="sm" variant="secondary" icon={Upload} className="mt-2.5">Upload favicon</Button>
+              <p className="text-body-sm font-medium text-ink">{t('settingsPages.favicon')}</p>
+              <p className="mt-0.5 text-caption text-ink-3">{t('settingsPages.faviconHint')}</p>
+              <Button size="sm" variant="secondary" icon={Upload} className="mt-2.5">{t('settingsPages.uploadFavicon')}</Button>
             </div>
           </div>
         </CardBody>
       </Card>
 
       <Card>
-        <CardHeader title="Business address" description="Appears on invoices and shipping labels." />
+        <CardHeader title={t('settingsPages.businessAddress')} description={t('settingsPages.addressHint')} />
         <CardBody className="flex flex-col gap-4">
-          <Input label="Address line 1" value={form.address1} onChange={patch('address1')} />
-          <Input label="Address line 2" value={form.address2} onChange={patch('address2')} />
+          <Input label={t('settingsPages.address1')} value={form.address1} onChange={patch('address1')} />
+          <Input label={t('settingsPages.address2')} value={form.address2} onChange={patch('address2')} />
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-            <Input label="City" value={form.city} onChange={patch('city')} />
-            <Input label="Postcode" value={form.postcode} onChange={patch('postcode')} />
+            <Input label={t('settingsPages.city')} value={form.city} onChange={patch('city')} />
+            <Input label={t('settingsPages.postcode')} value={form.postcode} onChange={patch('postcode')} />
             <Select
-              label="Country"
+              label={t('settingsPages.country')}
               value={form.country}
               onChange={patch('country')}
               options={[
-                { value: 'DE', label: 'Germany' },
-                { value: 'GB', label: 'United Kingdom' },
-                { value: 'US', label: 'United States' },
-                { value: 'NL', label: 'Netherlands' },
+                { value: 'DE', label: t('settingsPages.countryDE') },
+                { value: 'GB', label: t('settingsPages.countryGB') },
+                { value: 'US', label: t('settingsPages.countryUS') },
+                { value: 'NL', label: t('settingsPages.countryNL') },
               ]}
             />
           </div>
@@ -69,12 +69,12 @@ export default function StoreSettingsPage() {
       </Card>
 
       <Card>
-        <CardHeader title="Business information" description="Required for tax and compliance." />
+        <CardHeader title={t('settingsPages.businessInfo')} description={t('settingsPages.businessInfoHint')} />
         <CardBody className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <Input label="Legal entity name" value={form.legalName} onChange={patch('legalName')} />
-          <Input label="VAT number" value={form.vat} onChange={patch('vat')} className="font-mono" />
-          <Input label="Company registration" value={form.registration} onChange={patch('registration')} className="font-mono" />
-          <Input label="Registered since" type="date" value={form.registeredSince} onChange={patch('registeredSince')} />
+          <Input label={t('settingsPages.legalName')} value={form.legalName} onChange={patch('legalName')} />
+          <Input label={t('settingsPages.vat')} value={form.vat} onChange={patch('vat')} className="font-mono" />
+          <Input label={t('settingsPages.registration')} value={form.registration} onChange={patch('registration')} className="font-mono" />
+          <Input label={t('settingsPages.registeredSince')} type="date" value={form.registeredSince} onChange={patch('registeredSince')} />
         </CardBody>
       </Card>
     </SettingsLayout>

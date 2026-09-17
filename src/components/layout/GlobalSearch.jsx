@@ -138,7 +138,7 @@ export default function GlobalSearch() {
       <div
         role="dialog"
         aria-modal="true"
-        aria-label="Search Nova"
+        aria-label="Search Nexora"
         className="relative flex w-full max-w-xl animate-slide-up flex-col overflow-hidden rounded-card-lg border border-line bg-surface shadow-xl"
       >
         {/* Input */}

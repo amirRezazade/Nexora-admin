@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { cn } from '@/lib/format';
 import { useI18n } from '@/i18n/I18nProvider';
-import { NovaMark } from '@/components/layout/Sidebar';
+import NexoraLogo from '@/components/brand/NexoraLogo';
 
 /**
  * Split auth layout: branded panel on the left, focused form on the right.
@@ -14,7 +14,7 @@ export default function AuthLayout({ title, description, children, footer }) {
   return (
     <div className="flex min-h-screen bg-canvas">
       {/* Brand panel */}
-      <aside className="relative hidden w-[42%] max-w-[560px] flex-col justify-between overflow-hidden border-r border-line bg-surface p-10 lg:flex">
+      <aside className="relative hidden w-[42%] max-w-[560px] flex-col justify-between overflow-hidden border-e border-line bg-surface p-10 lg:flex">
         {/* Restrained background texture — a faint grid, not a gradient wash */}
         <div
           aria-hidden
@@ -33,11 +33,7 @@ export default function AuthLayout({ title, description, children, footer }) {
             href="/"
             className="inline-flex items-center gap-2.5 rounded-control focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
           >
-            <NovaMark />
-            <span>
-              <span className="block text-[15px] font-bold leading-5 tracking-tight text-ink">{t('brand.name')}</span>
-              <span className="block text-[11px] leading-4 text-ink-3">{t('brand.tagline')}</span>
-            </span>
+            <NexoraLogo />
           </Link>
         </div>
 
@@ -75,8 +71,7 @@ export default function AuthLayout({ title, description, children, footer }) {
             href="/"
             className="mb-8 inline-flex items-center gap-2.5 rounded-control lg:hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
           >
-            <NovaMark />
-            <span className="text-[15px] font-bold tracking-tight text-ink">Nova</span>
+            <NexoraLogo />
           </Link>
 
           <h1 className="text-h1 text-ink">{title}</h1>

@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { useDispatch, useSelector } from 'react-redux';
@@ -21,7 +21,7 @@ import PageHeader from '@/components/ui/PageHeader';
 import Button from '@/components/ui/Button';
 import IconButton from '@/components/ui/IconButton';
 import Card from '@/components/ui/Card';
-import Input from '@/components/ui/Input';
+import Input, { numberFocusGuards } from '@/components/ui/Input';
 import Select from '@/components/ui/Select';
 import StatCard from '@/components/ui/StatCard';
 import Pagination from '@/components/ui/Pagination';
@@ -35,10 +35,16 @@ import ErrorState from '@/components/ui/ErrorState';
 /** Inline stock editing keeps the operational loop tight — no page hop
  *  required to correct a count. */
 function StockEditor({ row }) {
+  const { t } = useI18n();
   const dispatch = useDispatch();
+  const inputRef = useRef(null);
   const [editing, setEditing] = useState(false);
   const [value, setValue] = useState(row.available);
   const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    if (editing) inputRef.current?.focus({ preventScroll: true });
+  }, [editing]);
 
   const save = async () => {
     const next = parseInt(value, 10);
@@ -50,10 +56,10 @@ function StockEditor({ row }) {
     setSaving(true);
     try {
       await dispatch(adjustStock({ id: row.id, available: next })).unwrap();
-      dispatch(toast.success('Stock updated', `${row.name} set to ${next} units.`));
+      dispatch(toast.success(t('toast.stockUpdated'), t('toast.stockUpdatedHint', { name: row.name, n: next })));
       setEditing(false);
     } catch {
-      dispatch(toast.error('We couldn’t update the stock level.', 'Please try again.'));
+      dispatch(toast.error(t('toast.stockError'), t('common.tryAgain')));
     } finally {
       setSaving(false);
     }
@@ -80,9 +86,9 @@ function StockEditor({ row }) {
   return (
     <span className="inline-flex items-center gap-1">
       <input
+        ref={inputRef}
         type="number"
         min="0"
-        autoFocus
         value={value}
         disabled={saving}
         onChange={(e) => setValue(e.target.value)}
@@ -93,6 +99,7 @@ function StockEditor({ row }) {
         onBlur={save}
         aria-label={`Available stock for ${row.name}`}
         className="h-7 w-20 rounded-control border border-brand bg-surface px-2 text-right text-body-sm tabular-nums focus:outline-none focus:ring-[3px] focus:ring-brand/20"
+        {...numberFocusGuards()}
       />
       <IconButton icon={Check} size="xs" label="Save stock level" variant="brand" onClick={save} disabled={saving} />
     </span>
@@ -135,7 +142,7 @@ export default function InventoryPage() {
   };
 
   const exportInventory = () => {
-    downloadCSV(`nova-inventory-${new Date().toISOString().slice(0, 10)}.csv`, items, [
+    downloadCSV(`nexora-inventory-${new Date().toISOString().slice(0, 10)}.csv`, items, [
       { header: 'Product', value: (r) => r.name },
       { header: 'SKU', value: (r) => r.sku },
       { header: 'Category', value: (r) => catName(r.categoryId) },
@@ -150,7 +157,7 @@ export default function InventoryPage() {
       { header: 'Location', value: (r) => r.location },
       { header: 'Last updated', value: (r) => r.updatedAt },
     ]);
-    dispatch(toast.success('Export ready', `${items.length} inventory rows exported as CSV.`));
+    dispatch(toast.success(t('toast.exportReady'), t('toast.exportedCsv', { n: items.length, label: t('inventoryPage.itemLabel') })));
   };
 
   const hasFilters = Boolean(filters.q) || filters.status.length > 0 || filters.category.length > 0;

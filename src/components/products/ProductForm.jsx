@@ -18,7 +18,7 @@ import { fetchCategories } from '@/store/slices/categoriesSlice';
 import Button from '@/components/ui/Button';
 import IconButton from '@/components/ui/IconButton';
 import Card, { CardHeader, CardBody } from '@/components/ui/Card';
-import Input from '@/components/ui/Input';
+import Input, { numberFocusGuards } from '@/components/ui/Input';
 import Textarea from '@/components/ui/Textarea';
 import Select from '@/components/ui/Select';
 import Alert from '@/components/ui/Alert';
@@ -26,11 +26,11 @@ import Badge from '@/components/ui/Badge';
 import Accordion from '@/components/ui/Accordion';
 import ProductGallery from '@/components/products/ProductGallery';
 
-const BRANDS = ['Nova Basics', 'Nike', 'Aurex', 'Aldgate', 'Keystone', 'Terra Studio', 'Ridgeline'];
+const BRANDS = ['Nexora Basics', 'Nike', 'Aurex', 'Aldgate', 'Keystone', 'Terra Studio', 'Ridgeline'];
 const SUPPLIERS = ['Loomcraft Textiles', 'Aurex Audio', 'Aldgate Leather Co.', 'Keystone Peripherals', 'Terra Ceramics', 'Ridgeline Outdoor', 'Northwind Athletics'];
 
 const EMPTY = {
-  name: '', nameFa: '', sku: '', categoryId: '', brand: 'Nova Basics', supplier: 'Loomcraft Textiles',
+  name: '', nameFa: '', sku: '', categoryId: '', brand: 'Nexora Basics', supplier: 'Loomcraft Textiles',
   status: 'draft', price: '', compareAt: '', cost: '', stock: '', threshold: '10',
   description: '', descriptionFa: '', seoTitle: '', metaDescription: '', slug: '',
   variants: [], tags: [], images: [],
@@ -115,8 +115,8 @@ export default function ProductForm({ mode = 'create', initial = null, productId
 
       dispatch(
         toast.success(
-          mode === 'create' ? 'Product created successfully.' : 'Changes saved.',
-          `“${res.data.name}” is now ${res.data.status}.`
+          mode === 'create' ? t('toast.productCreated') : t('toast.productSaved'),
+          t('toast.productNow', { name: res.data.name, status: t(`status.${res.data.status}`) })
         )
       );
       setDirty(false);
@@ -125,9 +125,9 @@ export default function ProductForm({ mode = 'create', initial = null, productId
       if (err.errors) {
         setErrors(err.errors);
         requestAnimationFrame(() => errorSummaryRef.current?.focus());
-        dispatch(toast.error('We couldn’t save the product.', 'Check the highlighted fields and try again.'));
+        dispatch(toast.error(t('toast.productSaveError'), t('toast.productSaveFields')));
       } else {
-        dispatch(toast.error('We couldn’t save the product.', err.message));
+        dispatch(toast.error(t('toast.productSaveError'), err.message));
       }
       setSubmitting(false);
     }
@@ -428,6 +428,7 @@ export default function ProductForm({ mode = 'create', initial = null, productId
                               onChange={(e) => updateVariant(i, 'price', e.target.value ? parseFloat(e.target.value) : null)}
                               placeholder={values.price || '—'}
                               className="h-8 w-24 rounded-control border border-line-strong bg-surface px-2 text-right text-body-sm tabular-nums focus:border-brand focus:outline-none focus:ring-[3px] focus:ring-brand/20"
+                              {...numberFocusGuards()}
                             />
                           </td>
                           <td className="py-2 pr-3 text-right">
@@ -438,6 +439,7 @@ export default function ProductForm({ mode = 'create', initial = null, productId
                               value={v.stock ?? 0}
                               onChange={(e) => updateVariant(i, 'stock', parseInt(e.target.value, 10) || 0)}
                               className="h-8 w-20 rounded-control border border-line-strong bg-surface px-2 text-right text-body-sm tabular-nums focus:border-brand focus:outline-none focus:ring-[3px] focus:ring-brand/20"
+                              {...numberFocusGuards()}
                             />
                           </td>
                           <td className="py-2 text-right">
@@ -475,7 +477,7 @@ export default function ProductForm({ mode = 'create', initial = null, productId
           <Section id="seo" title={t('form.seo')} description="How this product appears in search results" icon={SearchIcon}>
             <Input
               label={t('form.seoTitle')}
-              placeholder={values.name ? `${values.name} | Nova Store` : 'Product name | Nova Store'}
+              placeholder={values.name ? `${values.name} | Nexora Store` : 'Product name | Nexora Store'}
               value={values.seoTitle}
               onChange={set('seoTitle')}
               hint="Aim for 50–60 characters."
@@ -498,7 +500,7 @@ export default function ProductForm({ mode = 'create', initial = null, productId
                 setSlugTouched(true);
                 set('slug')(e);
               }}
-              hint={`novastore.com/products/${values.slug || 'your-product'}`}
+              hint={`nexora.com/products/${values.slug || 'your-product'}`}
               className="font-mono text-body-sm"
             />
           </Section>

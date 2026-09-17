@@ -2,7 +2,7 @@
 @config "../../tailwind.config.js";
 
 /* ==========================================================================
-   Nova — Design tokens
+   Nexora — Design tokens
    Light is the primary theme. Dark is a purpose-built neutral palette with a
    re-tuned orange (lighter, less saturated) so contrast holds on dark surfaces.
    ========================================================================== */
@@ -134,6 +134,12 @@
 
   html {
     -webkit-text-size-adjust: 100%;
+    overflow-anchor: none;
+    overflow-x: clip;
+  }
+
+  input[type="number"] {
+    scroll-margin: 0;
   }
 
   html[data-locale="fa"],
@@ -275,12 +281,12 @@
   outline: none;
 }
 
-/* Swiper — match Nova controls, not default blue */
-.nova-gallery .swiper {
+/* Swiper — match Nexora controls, not default blue */
+.nexora-gallery .swiper {
   height: 100%;
 }
-.nova-gallery .swiper-button-next,
-.nova-gallery .swiper-button-prev {
+.nexora-gallery .swiper-button-next,
+.nexora-gallery .swiper-button-prev {
   width: 32px;
   height: 32px;
   border-radius: 8px;
@@ -289,19 +295,19 @@
   color: rgb(var(--c-ink));
   box-shadow: var(--shadow-xs);
 }
-.nova-gallery .swiper-button-next::after,
-.nova-gallery .swiper-button-prev::after {
+.nexora-gallery .swiper-button-next::after,
+.nexora-gallery .swiper-button-prev::after {
   font-size: 12px;
   font-weight: 700;
 }
-.nova-gallery .swiper-pagination-bullet {
+.nexora-gallery .swiper-pagination-bullet {
   background: rgb(var(--c-ink-3));
   opacity: 0.5;
 }
-.nova-gallery .swiper-pagination-bullet-active {
+.nexora-gallery .swiper-pagination-bullet-active {
   background: rgb(var(--c-brand));
   opacity: 1;
 }
-.nova-gallery-thumbs .swiper-slide {
+.nexora-gallery-thumbs .swiper-slide {
   height: auto;
 }

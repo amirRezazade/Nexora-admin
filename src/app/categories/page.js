@@ -71,10 +71,10 @@ function CategoryDialog({ open, onClose, category, parents }) {
     try {
       if (editing) {
         await dispatch(updateCategory({ id: category.id, ...values })).unwrap();
-        dispatch(toast.success('Category updated', `“${values.name}” was saved.`));
+        dispatch(toast.success(t('toast.categoryUpdated'), t('toast.categorySavedHint', { name: values.name })));
       } else {
         await dispatch(createCategory(values)).unwrap();
-        dispatch(toast.success('Category created', `“${values.name}” is ready to use.`));
+        dispatch(toast.success(t('toast.categoryCreated'), t('toast.categoryCreatedHint', { name: values.name })));
       }
       onClose();
     } catch (err) {
@@ -93,10 +93,10 @@ function CategoryDialog({ open, onClose, category, parents }) {
       footer={
         <>
           <Button variant="secondary" onClick={onClose} disabled={saving}>
-            Cancel
+            {t('common.cancel')}
           </Button>
           <Button variant="primary" onClick={submit} loading={saving}>
-            {saving ? 'Saving…' : editing ? 'Save Changes' : 'Add Category'}
+            {saving ? t('common.saving') : editing ? t('common.save') : t('form.addCategory')}
           </Button>
         </>
       }
@@ -127,7 +127,7 @@ function CategoryDialog({ open, onClose, category, parents }) {
           label="URL slug"
           value={values.slug}
           onChange={(e) => { setSlugTouched(true); setValues((v) => ({ ...v, slug: e.target.value })); }}
-          hint={`novastore.com/collections/${values.slug || 'your-category'}`}
+          hint={`nexora.com/collections/${values.slug || 'your-category'}`}
           className="font-mono text-body-sm"
         />
         <div className="grid grid-cols-2 gap-4">
@@ -200,10 +200,10 @@ export default function CategoriesPage() {
     setDeleting(true);
     try {
       await dispatch(deleteCategory(confirmDelete.id)).unwrap();
-      dispatch(toast.success('Category deleted', `“${confirmDelete.name}” was removed.`));
+      dispatch(toast.success(t('toast.categoryDeleted'), t('toast.categoryDeletedHint', { name: confirmDelete.name })));
       setConfirmDelete(null);
     } catch (msg) {
-      dispatch(toast.error('We couldn’t delete this category.', typeof msg === 'string' ? msg : 'Please try again.'));
+      dispatch(toast.error(t('toast.categoryDeleteError'), typeof msg === 'string' ? msg : t('common.tryAgain')));
     } finally {
       setDeleting(false);
     }
@@ -401,13 +401,13 @@ export default function CategoriesPage() {
         onClose={() => setConfirmDelete(null)}
         onConfirm={doDelete}
         loading={deleting}
-        title="Delete category?"
+        title={t('confirm.deleteCategory')}
         message={
           confirmDelete
-            ? `Are you sure you want to delete “${confirmDelete.name}”? This action cannot be undone. Categories containing products can’t be deleted.`
+            ? t('confirm.deleteCategoryMsg', { name: confirmDelete.name })
             : ''
         }
-        confirmLabel="Delete category"
+        confirmLabel={t('common.delete')}
       />
     </div>
   );

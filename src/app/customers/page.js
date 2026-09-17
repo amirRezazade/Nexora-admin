@@ -53,7 +53,7 @@ export default function CustomersPage() {
   }, [dispatch, filters, sort, page, pageSize]);
 
   const exportCustomers = () => {
-    downloadCSV(`nova-customers-${new Date().toISOString().slice(0, 10)}.csv`, items, [
+    downloadCSV(`nexora-customers-${new Date().toISOString().slice(0, 10)}.csv`, items, [
       { header: 'Name', value: (r) => r.name },
       { header: 'Email', value: (r) => r.email },
       { header: 'Phone', value: (r) => r.phone },
@@ -66,7 +66,7 @@ export default function CustomersPage() {
       { header: 'Last order', value: (r) => (r.lastOrder ? r.lastOrder.slice(0, 10) : '') },
       { header: 'Status', value: (r) => CUSTOMER_STATUS[r.status]?.label },
     ]);
-    dispatch(toast.success('Export ready', `${items.length} customers exported as CSV.`));
+    dispatch(toast.success(t('toast.exportReady'), t('toast.exportedCsv', { n: items.length, label: t('customersPage.itemLabel') })));
   };
 
   const hasFilters = Boolean(filters.q) || filters.status.length > 0 || filters.segment.length > 0;
@@ -259,7 +259,7 @@ export default function CustomersPage() {
                               {t('common.sendEmail')}
                             </MenuItem>
                             <MenuSeparator />
-                            <MenuItem icon={Ban} destructive onClick={() => { close(); dispatch(toast.warning('Blocking is not available in this demo.')); }}>
+                            <MenuItem icon={Ban} destructive onClick={() => { close(); dispatch(toast.warning(t('toast.blockDemo'))); }}>
                               {t('customersPage.block')}
                             </MenuItem>
                           </>

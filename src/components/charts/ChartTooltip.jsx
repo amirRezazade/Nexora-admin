@@ -3,7 +3,7 @@
 import { cn } from '@/lib/format';
 
 /**
- * One tooltip for every chart in Nova, so the reading experience is identical
+ * One tooltip for every chart in Nexora, so the reading experience is identical
  * whether you're on the dashboard or deep in analytics.
  */
 export default function ChartTooltip({ active, payload, label, formatter, labelFormatter, showTotal = false }) {

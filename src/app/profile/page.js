@@ -31,7 +31,7 @@ export default function ProfilePage() {
     email: user?.email || '',
     role: user?.role || '',
     phone: '+49 151 5550 8842',
-    bio: 'Running the Nova storefront day to day — catalog, merchandising and the odd 2am inventory panic.',
+    bio: 'Running the Nexora storefront day to day — catalog, merchandising and the odd 2am inventory panic.',
   });
   const [errors, setErrors] = useState({});
   const [saving, setSaving] = useState(false);
@@ -60,7 +60,7 @@ export default function ProfilePage() {
     setSaving(true);
     await new Promise((r) => setTimeout(r, 700));
     dispatch(updateProfile({ name: values.name, email: values.email }));
-    dispatch(toast.success('Profile updated.', 'Your details have been saved.'));
+    dispatch(toast.success(t('toast.profileUpdated'), t('toast.profileUpdatedHint')));
     setSaving(false);
     setDirty(false);
   };
@@ -79,7 +79,7 @@ export default function ProfilePage() {
     await new Promise((r) => setTimeout(r, 800));
     setPwSaving(false);
     setPw({ current: '', next: '', confirm: '' });
-    dispatch(toast.success('Password updated.', 'Use your new password next time you sign in.'));
+    dispatch(toast.success(t('toast.passwordUpdated'), t('toast.passwordUpdatedHint')));
   };
 
   return (
@@ -128,7 +128,7 @@ export default function ProfilePage() {
         <div className="flex flex-col gap-4">
           {/* Personal information */}
           <Card>
-            <CardHeader title={t('profilePage.personal')} description="How you appear across Nova." />
+            <CardHeader title={t('profilePage.personal')} description="How you appear across Nexora." />
             <CardBody>
               <form onSubmit={savePersonal} noValidate className="flex flex-col gap-4">
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -211,7 +211,7 @@ export default function ProfilePage() {
               sessions={sessions}
               onRevoke={(s) => {
                 setSessions((list) => list.filter((x) => x.id !== s.id));
-                dispatch(toast.success('Session ended', `${s.device} was signed out.`));
+                dispatch(toast.success(t('toast.sessionEnded'), t('toast.sessionEndedHint', { device: s.device })));
               }}
             />
           </Card>

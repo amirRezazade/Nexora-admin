@@ -9,7 +9,7 @@ import { useI18n } from "@/i18n/I18nProvider";
 import { toggleSidebar, setMobileNav } from "@/store/slices/uiSlice";
 import Tooltip from "@/components/ui/Tooltip";
 import Avatar from "@/components/ui/Avatar";
-import Image from "next/image";
+import NexoraLogo from "@/components/brand/NexoraLogo";
 
 export const NAV_GROUPS = [
   {
@@ -50,13 +50,7 @@ export const NAV_GROUPS = [
   },
 ];
 
-export function NovaMark({ className }) {
-  return (
-    <span aria-hidden className={cn("flex h-8 w-8 shrink-0 items-center justify-center rounded-[9px]  text-white ", className)}>
-      <Image width={40} height={40} src={"/images/avatars/nexora-favicon-exact.ico"} />
-    </span>
-  );
-}
+export { default as NovaMark } from "@/components/brand/NexoraLogo";
 
 function isActive(pathname, href) {
   if (href === "/") return pathname === "/";
@@ -83,13 +77,13 @@ function NavLink({ item, collapsed, unread, onNavigate }) {
       <Icon aria-hidden className={cn("h-[18px] w-[18px] shrink-0", active ? "text-brand" : "text-ink-3 group-hover:text-ink-2")} />
       {!collapsed && <span className="flex-1 truncate">{label}</span>}
       {!collapsed && badge && <span className="rounded-pill bg-brand px-1.5 text-[11px] font-semibold leading-4 tabular-nums text-white">{badge > 99 ? "99+" : badge}</span>}
-      {collapsed && badge && <span aria-hidden className="absolute right-1.5 top-1.5 h-1.5 w-1.5 rounded-full bg-brand ring-2 ring-surface" />}
+      {collapsed && badge && <span aria-hidden className="absolute end-1.5 top-1.5 h-1.5 w-1.5 rounded-full bg-brand ring-2 ring-surface" />}
     </Link>
   );
 
   if (!collapsed) return link;
   return (
-    <Tooltip content={badge ? `${label} (${badge})` : label} side="right" delay={80}>
+    <Tooltip content={badge ? `${label} (${badge})` : label} side="end" delay={80}>
       {link}
     </Tooltip>
   );
@@ -105,20 +99,14 @@ export function SidebarContent({ collapsed = false, onNavigate }) {
   return (
     <div className="flex h-full flex-col bg-surface">
       {/* Brand */}
-      <div className={cn("flex h-14 shrink-0 items-center border-b border-line", collapsed ? "justify-center px-2" : "gap-2.5 px-4")}>
-        <Link href="/" onClick={onNavigate} className="flex min-w-0 items-center gap-2.5 rounded-control focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand" aria-label={`${t("brand.name")} — ${t("brand.tagline")}`}>
-          <NovaMark />
-          {!collapsed && (
-            <span className="min-w-0">
-              <span className="block truncate text-[15px] font-bold leading-5 tracking-tight text-ink">{t("brand.name")}</span>
-              <span className="block truncate text-[11px] leading-4 text-ink-3">{t("brand.tagline")}</span>
-            </span>
-          )}
+      <div className={cn("flex h-14 shrink-0 items-center border-b border-line", collapsed ? "justify-center px-2" : "px-3")}>
+        <Link href="/" onClick={onNavigate} className="flex min-w-0 items-center rounded-control focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand" aria-label={`${t("brand.name")} — ${t("brand.tagline")}`}>
+          <NexoraLogo compact={collapsed} />
         </Link>
       </div>
 
       {/* Navigation */}
-      <nav aria-label="Main navigation" className={cn("flex-1  py-3", collapsed ? "px-3" : "px-3")}>
+      <nav aria-label="Main navigation" className={cn("flex-1 overflow-y-auto overflow-x-hidden py-3", collapsed ? "px-3" : "px-3")}>
         {NAV_GROUPS.map((group, gi) => (
           <div key={group.labelKey} className={cn(gi > 0 && "mt-5")}>
             {collapsed ? gi > 0 && <div aria-hidden className="mx-auto mb-3 h-px w-6 bg-line" /> : <p className="mb-1.5 px-2.5 text-micro uppercase tracking-wider text-ink-3">{t(group.labelKey)}</p>}
@@ -140,17 +128,6 @@ export function SidebarContent({ collapsed = false, onNavigate }) {
             <NavLink item={{ href: "/support", labelKey: "nav.support", icon: LifeBuoy }} collapsed={collapsed} onNavigate={onNavigate} />
           </li>
         </ul>
-
-        <Link href="/profile" onClick={onNavigate} className={cn("mt-2 flex items-center gap-2.5 rounded-control py-2 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand", collapsed ? "justify-center px-0" : "px-2", isActive(pathname, "/profile") ? "bg-brand-soft" : "hover:bg-surface-3")}>
-          <Avatar name={user?.name || "Sarah Chen"} tone="brand" size={collapsed ? "sm" : "md"} />
-          {!collapsed && (
-            <span className="min-w-0 flex-1">
-              <span className="block truncate text-body-sm font-medium text-ink">{user?.name}</span>
-              <span className="block truncate text-caption text-ink-3">{user?.role}</span>
-            </span>
-          )}
-          {!collapsed && <ChevronRight aria-hidden className="h-4 w-4 shrink-0 text-ink-3" />}
-        </Link>
 
         {/* Collapse control — desktop only */}
         <button type="button" onClick={() => dispatch(toggleSidebar())} className={cn("mt-2 hidden w-full items-center gap-2.5 rounded-control py-2 text-body-sm font-medium text-ink-3 transition-colors hover:bg-surface-3 hover:text-ink lg:flex", "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand", collapsed ? "justify-center px-0" : "px-2.5")} aria-label={collapsed ? t("nav.expand") : t("nav.collapse")}>
@@ -187,7 +164,7 @@ export function MobileSidebar() {
   return (
     <div className="fixed inset-0 z-[60] lg:hidden">
       <div className="absolute inset-0 animate-fade-in bg-overlay/45 backdrop-blur-[2px]" onClick={close} aria-hidden />
-      <div role="dialog" aria-modal="true" aria-label="Navigation menu" className="absolute inset-y-0 left-0 w-[272px] animate-slide-in-left border-r border-line shadow-xl">
+      <div role="dialog" aria-modal="true" aria-label="Navigation menu" className="absolute inset-y-0 start-0 w-[272px] animate-slide-in-left border-e border-line shadow-xl">
         <SidebarContent onNavigate={close} />
       </div>
     </div>

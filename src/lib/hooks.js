@@ -70,7 +70,7 @@ export function useFocusTrap(ref, active) {
     const focusFirst = () => {
       const els = node.querySelectorAll(selector);
       const target = node.querySelector('[data-autofocus]') || els[0];
-      target?.focus();
+      target?.focus({ preventScroll: true });
     };
     const raf = requestAnimationFrame(focusFirst);
 
@@ -84,17 +84,17 @@ export function useFocusTrap(ref, active) {
       const last = els[els.length - 1];
       if (e.shiftKey && document.activeElement === first) {
         e.preventDefault();
-        last.focus();
+        last.focus({ preventScroll: true });
       } else if (!e.shiftKey && document.activeElement === last) {
         e.preventDefault();
-        first.focus();
+        first.focus({ preventScroll: true });
       }
     };
     node.addEventListener('keydown', onKeyDown);
     return () => {
       cancelAnimationFrame(raf);
       node.removeEventListener('keydown', onKeyDown);
-      if (previouslyFocused instanceof HTMLElement) previouslyFocused.focus();
+      if (previouslyFocused instanceof HTMLElement) previouslyFocused.focus({ preventScroll: true });
     };
   }, [ref, active]);
 }

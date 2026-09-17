@@ -64,13 +64,13 @@ export default function ReviewsPage() {
       await api(`/api/reviews/${review.id}`, { method: 'PATCH', body: { status } });
       dispatch(
         toast.success(
-          status === 'published' ? 'Review published' : status === 'hidden' ? 'Review hidden' : 'Review updated',
-          `${review.customerName}’s review on ${review.productName}.`
+          status === 'published' ? t('toast.reviewPublished') : status === 'hidden' ? t('toast.reviewHidden') : t('toast.reviewUpdated'),
+          t('toast.reviewHint', { name: review.customerName, product: review.productName })
         )
       );
       load();
     } catch {
-      dispatch(toast.error('We couldn’t update the review.', 'Please try again.'));
+      dispatch(toast.error(t('toast.reviewUpdateError'), t('common.tryAgain')));
     }
   };
 
@@ -78,11 +78,11 @@ export default function ReviewsPage() {
     setDeleting(true);
     try {
       await api(`/api/reviews/${confirmDelete.id}`, { method: 'DELETE' });
-      dispatch(toast.success('Review deleted', 'It has been removed from your store.'));
+      dispatch(toast.success(t('toast.reviewDeleted'), t('toast.reviewDeletedHint')));
       setConfirmDelete(null);
       load();
     } catch {
-      dispatch(toast.error('We couldn’t delete the review.', 'Please try again.'));
+      dispatch(toast.error(t('toast.reviewDeleteError'), t('common.tryAgain')));
     } finally {
       setDeleting(false);
     }
@@ -298,13 +298,13 @@ export default function ReviewsPage() {
         onClose={() => setConfirmDelete(null)}
         onConfirm={doDelete}
         loading={deleting}
-        title={t('reviewsPage.deleteTitle')}
+        title={t('confirm.deleteReview')}
         message={
           confirmDelete
-            ? `Are you sure you want to delete ${confirmDelete.customerName}’s review of “${confirmDelete.productName}”? This action cannot be undone.`
+            ? t('confirm.deleteReviewMsg', { name: confirmDelete.customerName, product: confirmDelete.productName })
             : ''
         }
-        confirmLabel="Delete review"
+        confirmLabel={t('common.delete')}
       />
     </div>
   );

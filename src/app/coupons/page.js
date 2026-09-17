@@ -79,12 +79,12 @@ function CouponDialog({ open, onClose, coupon, onSaved }) {
     try {
       if (editing) await api(`/api/coupons/${coupon.id}`, { method: 'PUT', body: values });
       else await api('/api/coupons', { method: 'POST', body: values });
-      dispatch(toast.success(editing ? 'Coupon updated' : 'Coupon created', `${values.code.toUpperCase()} is ready to use.`));
+      dispatch(toast.success(editing ? t('toast.couponUpdated') : t('toast.couponCreated'), t('toast.couponReady', { code: values.code.toUpperCase() })));
       onSaved();
       onClose();
     } catch (err) {
       if (err.errors) setErrors(err.errors);
-      else dispatch(toast.error('We couldn’t save the coupon.', err.message));
+      else dispatch(toast.error(t('toast.couponSaveError'), err.message));
     } finally {
       setSaving(false);
     }
@@ -254,11 +254,11 @@ export default function CouponsPage() {
     setDeleting(true);
     try {
       await api(`/api/coupons/${confirmDelete.id}`, { method: 'DELETE' });
-      dispatch(toast.success('Coupon deleted', `${confirmDelete.code} was removed.`));
+      dispatch(toast.success(t('toast.couponDeleted'), t('toast.couponDeletedHint', { code: confirmDelete.code })));
       setConfirmDelete(null);
       load();
     } catch {
-      dispatch(toast.error('We couldn’t delete the coupon.', 'Please try again.'));
+      dispatch(toast.error(t('toast.couponDeleteError'), t('common.tryAgain')));
     } finally {
       setDeleting(false);
     }
@@ -268,10 +268,10 @@ export default function CouponsPage() {
     const next = c.status === 'disabled' ? 'active' : 'disabled';
     try {
       await api(`/api/coupons/${c.id}`, { method: 'PUT', body: { ...c, status: next } });
-      dispatch(toast.success(next === 'active' ? 'Coupon enabled' : 'Coupon disabled', `${c.code} is now ${next}.`));
+      dispatch(toast.success(next === 'active' ? t('toast.couponEnabled') : t('toast.couponDisabled'), t('toast.couponNow', { code: c.code, status: t(`status.${next}`) })));
       load();
     } catch {
-      dispatch(toast.error('We couldn’t update the coupon.'));
+      dispatch(toast.error(t('toast.couponUpdateError')));
     }
   };
 
@@ -384,7 +384,7 @@ export default function CouponsPage() {
                               type="button"
                               onClick={() => {
                                 navigator.clipboard?.writeText(c.code);
-                                dispatch(toast.success('Coupon code copied to clipboard.'));
+                                dispatch(toast.success(t('toast.couponCopied')));
                               }}
                               className="group/copy flex items-center gap-1.5 rounded font-mono text-body-sm font-semibold text-ink transition-colors hover:text-brand-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
                               aria-label={`Copy coupon code ${c.code}`}
@@ -440,7 +440,7 @@ export default function CouponsPage() {
                                 onClick={() => {
                                   close();
                                   navigator.clipboard?.writeText(c.code);
-                                  dispatch(toast.success('Coupon code copied to clipboard.'));
+                                  dispatch(toast.success(t('toast.couponCopied')));
                                 }}
                               >
                                 {t('couponsPage.copyCode')}
@@ -486,9 +486,9 @@ export default function CouponsPage() {
         onClose={() => setConfirmDelete(null)}
         onConfirm={doDelete}
         loading={deleting}
-        title={t('couponsPage.deleteTitle')}
-        message={confirmDelete ? `Are you sure you want to delete “${confirmDelete.code}”? Customers using it at checkout will see an error. This action cannot be undone.` : ''}
-        confirmLabel="Delete coupon"
+        title={t('confirm.deleteCoupon')}
+        message={confirmDelete ? t('confirm.deleteCouponMsg', { code: confirmDelete.code }) : ''}
+        confirmLabel={t('common.delete')}
       />
     </div>
   );

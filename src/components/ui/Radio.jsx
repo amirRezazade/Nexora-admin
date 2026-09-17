@@ -27,27 +27,24 @@ export function Radio({ label, description, className, id, ...props }) {
 /** Card-style radio group used in Settings → Appearance. */
 export function RadioCards({ name, value, onChange, options, className }) {
   return (
-    <div role="radiogroup" className={cn('grid gap-3 sm:grid-cols-3', className)}>
+    <div role="radiogroup" aria-label={name} className={cn('grid gap-3 sm:grid-cols-3', className)}>
       {options.map((o) => {
         const selected = value === o.value;
         return (
-          <label
+          <button
             key={o.value}
+            type="button"
+            role="radio"
+            aria-checked={selected}
+            onClick={() => onChange(o.value)}
             className={cn(
-              'group relative flex cursor-pointer flex-col gap-2 rounded-card border p-4 transition-all duration-150',
+              'group relative flex cursor-pointer flex-col gap-2 rounded-card border p-4 text-start transition-all duration-150',
+              'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand',
               selected
                 ? 'border-brand bg-brand-softer ring-1 ring-brand'
                 : 'border-line bg-surface hover:border-line-strong hover:bg-surface-2'
             )}
           >
-            <input
-              type="radio"
-              name={name}
-              value={o.value}
-              checked={selected}
-              onChange={() => onChange(o.value)}
-              className="sr-only"
-            />
             {o.preview}
             <span className="flex items-center justify-between">
               <span className={cn('text-body font-medium', selected ? 'text-brand-text' : 'text-ink')}>
@@ -62,7 +59,7 @@ export function RadioCards({ name, value, onChange, options, className }) {
               />
             </span>
             {o.description && <span className="text-caption text-ink-3">{o.description}</span>}
-          </label>
+          </button>
         );
       })}
     </div>

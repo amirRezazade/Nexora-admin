@@ -157,7 +157,7 @@ export default function CustomerDetailsPage() {
                     {t('common.viewAll')} orders
                   </MenuItem>
                   <MenuSeparator />
-                  <MenuItem icon={Ban} destructive onClick={() => { close(); dispatch(toast.warning('Blocking is not available in this demo.')); }}>
+                  <MenuItem icon={Ban} destructive onClick={() => { close(); dispatch(toast.warning(t('toast.blockDemo'))); }}>
                     Block customer
                   </MenuItem>
                 </>

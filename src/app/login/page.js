@@ -70,7 +70,7 @@ export default function LoginPage() {
           required
           autoComplete="email"
           icon={Mail}
-          placeholder="you@novastore.com"
+          placeholder="you@nexora.com"
           value={email}
           onChange={(e) => { setEmail(e.target.value); setFieldErrors((f) => ({ ...f, email: undefined })); }}
           error={fieldErrors.email}

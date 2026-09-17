@@ -28,6 +28,7 @@ const sizes = {
 const Button = forwardRef(function Button(
   {
     as: Tag = 'button',
+    type,
     variant = 'secondary',
     size = 'md',
     loading = false,
@@ -44,6 +45,7 @@ const Button = forwardRef(function Button(
   return (
     <Tag
       ref={ref}
+      type={Tag === 'button' ? type || 'button' : undefined}
       disabled={Tag === 'button' ? isDisabled : undefined}
       aria-disabled={isDisabled || undefined}
       aria-busy={loading || undefined}

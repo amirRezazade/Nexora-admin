@@ -28,6 +28,28 @@ export default function AppShell({ children }) {
     dispatch(hydrateAuth());
   }, [dispatch]);
 
+  /* Number spinner / hidden control focus scrolls the page to the top in Chrome. */
+  useEffect(() => {
+    const onMouseDown = (e) => {
+      const el = e.target;
+      if (!(el instanceof HTMLElement)) return;
+      const input = el instanceof HTMLInputElement ? el : el.closest?.('input');
+      if (!input) return;
+      const hidden = input.classList.contains('sr-only');
+      if (input.type === 'number' || hidden) {
+        const x = window.scrollX;
+        const y = window.scrollY;
+        const restore = () => {
+          if (window.scrollX !== x || window.scrollY !== y) window.scrollTo(x, y);
+        };
+        requestAnimationFrame(restore);
+        setTimeout(restore, 0);
+      }
+    };
+    document.addEventListener('mousedown', onMouseDown, true);
+    return () => document.removeEventListener('mousedown', onMouseDown, true);
+  }, []);
+
   useEffect(() => {
     dispatch(setPageTitle(null));
   }, [pathname, dispatch]);

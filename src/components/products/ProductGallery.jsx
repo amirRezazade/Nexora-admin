@@ -98,7 +98,7 @@ export default function ProductGallery({ productId, name, images: incoming, edit
   }
 
   return (
-    <div className="nova-gallery flex flex-col gap-3">
+    <div className="nexora-gallery flex flex-col gap-3">
       <div className="group relative aspect-square w-full overflow-hidden rounded-card-lg border border-line bg-surface-2">
         <Swiper
           modules={[Navigation, Pagination, Thumbs, Keyboard, A11y]}
@@ -163,7 +163,7 @@ export default function ProductGallery({ productId, name, images: incoming, edit
         watchSlidesProgress
         slidesPerView={5}
         spaceBetween={8}
-        className="nova-gallery-thumbs w-full"
+        className="nexora-gallery-thumbs w-full"
       >
         {images.map((img, i) => (
           <SwiperSlide key={img.id} className="!h-auto !w-auto max-w-none flex-[1_0_calc(20%-6.4px)]">

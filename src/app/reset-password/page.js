@@ -41,7 +41,7 @@ export default function ResetPasswordPage() {
     if (Object.keys(errs).length) return;
 
     await dispatch(resetPassword());
-    dispatch(toast.success('Password updated', 'You can now sign in with your new password.'));
+    dispatch(toast.success(t('toast.passwordUpdated'), t('toast.passwordUpdatedHint')));
     router.push('/login');
   };
 

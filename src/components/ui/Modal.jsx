@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { X, AlertTriangle } from 'lucide-react';
 import { cn } from '@/lib/format';
+import { useI18n } from '@/i18n/I18nProvider';
 import { useEscape, useFocusTrap, useScrollLock } from '@/lib/hooks';
 import IconButton from './IconButton';
 import Button from './Button';
@@ -11,6 +12,7 @@ import Button from './Button';
 const widths = { sm: 'max-w-md', md: 'max-w-lg', lg: 'max-w-2xl', xl: 'max-w-4xl' };
 
 export default function Modal({ open, onClose, title, description, children, footer, size = 'md', closeOnOverlay = true }) {
+  const { t } = useI18n();
   const panelRef = useRef(null);
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
@@ -49,7 +51,7 @@ export default function Modal({ open, onClose, title, description, children, foo
               </p>
             )}
           </div>
-          <IconButton icon={X} label="Close dialog" onClick={onClose} className="-mr-1 -mt-1" />
+          <IconButton icon={X} label={t('confirm.close')} onClick={onClose} className="-mr-1 -mt-1" />
         </div>
         {children && <div className="px-5 pb-2 sm:px-6">{children}</div>}
         {footer && (
@@ -65,9 +67,10 @@ export default function Modal({ open, onClose, title, description, children, foo
 
 /** Destructive confirmation. Copy is explicit about what disappears. */
 export function ConfirmDialog({
-  open, onClose, onConfirm, title, message, confirmLabel = 'Delete', cancelLabel = 'Cancel',
+  open, onClose, onConfirm, title, message, confirmLabel, cancelLabel,
   loading = false, tone = 'danger',
 }) {
+  const { t } = useI18n();
   return (
     <Modal
       open={open}
@@ -77,7 +80,7 @@ export function ConfirmDialog({
       footer={
         <>
           <Button variant="secondary" onClick={onClose} disabled={loading} className="sm:w-auto">
-            {cancelLabel}
+            {cancelLabel || t('common.cancel')}
           </Button>
           <Button
             variant={tone === 'danger' ? 'danger' : 'primary'}
@@ -86,7 +89,7 @@ export function ConfirmDialog({
             data-autofocus
             className="sm:w-auto"
           >
-            {loading ? 'Deleting…' : confirmLabel}
+            {loading ? t('confirm.working') : (confirmLabel || t('common.delete'))}
           </Button>
         </>
       }

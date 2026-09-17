@@ -213,7 +213,7 @@ export function productToRow(body, extra = {}) {
     cost: body.cost ?? 0,
     stock: body.stock ?? 0,
     status: body.status || 'draft',
-    brand: body.brand || 'Nova Basics',
+    brand: body.brand || 'Nexora Basics',
     tags: body.tags || [],
     variants: body.variants || [],
     images: body.images || [],

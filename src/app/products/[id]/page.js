@@ -151,10 +151,10 @@ export default function ProductDetailsPage() {
     setDeleting(true);
     try {
       await api(`/api/products/${p.id}`, { method: 'DELETE' });
-      dispatch(toast.success('Product deleted', `“${p.name}” was removed from your catalog.`));
+      dispatch(toast.success(t('toast.productDeleted'), t('toast.productDeletedHint', { name: p.name })));
       router.push('/products');
     } catch {
-      dispatch(toast.error('We couldn’t delete the product.', 'Please try again.'));
+      dispatch(toast.error(t('toast.productDeleteError'), t('common.tryAgain')));
       setDeleting(false);
     }
   };
@@ -162,10 +162,10 @@ export default function ProductDetailsPage() {
   const duplicate = async () => {
     try {
       const res = await api(`/api/products/${p.id}`, { method: 'POST' });
-      dispatch(toast.success('Product duplicated', `“${res.data.name}” was created as a draft.`));
+      dispatch(toast.success(t('toast.productDuplicated'), t('toast.productDuplicatedHint', { name: res.data.name })));
       router.push(`/products/${res.data.id}`);
     } catch {
-      dispatch(toast.error('We couldn’t duplicate the product.'));
+      dispatch(toast.error(t('toast.productDuplicateError')));
     }
   };
 
@@ -369,7 +369,7 @@ export default function ProductDetailsPage() {
             {/* SERP preview makes the abstract fields concrete */}
             <div className="rounded-card border border-line bg-surface-2 p-4">
               <p className="truncate text-caption text-success-text">
-                novastore.com › products › {p.slug}
+                nexora.com › products › {p.slug}
               </p>
               <p className="mt-1 truncate text-body-lg text-info-text">{p.seoTitle}</p>
               <p className="mt-1 line-clamp-2 text-body-sm text-ink-2">{p.metaDescription}</p>
@@ -518,9 +518,9 @@ export default function ProductDetailsPage() {
         onClose={() => setConfirmDelete(false)}
         onConfirm={doDelete}
         loading={deleting}
-        title="Delete product?"
-        message={`Are you sure you want to delete “${p.name}”? This action cannot be undone.`}
-        confirmLabel="Delete product"
+        title={t('confirm.deleteProduct')}
+        message={t('confirm.deleteProductMsg', { name: localized(p, 'name', locale) })}
+        confirmLabel={t('products.deleteConfirm')}
       />
     </div>
   );

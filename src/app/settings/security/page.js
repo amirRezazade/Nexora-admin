@@ -2,9 +2,10 @@
 
 import { useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { Monitor, Smartphone, Tablet, LogOut, ShieldCheck, KeyRound } from 'lucide-react';
+import { Monitor, Smartphone, Tablet, LogOut } from 'lucide-react';
 import { relativeTime } from '@/lib/format';
 import { toast } from '@/store/slices/uiSlice';
+import { useI18n } from '@/i18n/I18nProvider';
 import SettingsLayout from '@/components/layout/SettingsLayout';
 import Card, { CardHeader, CardBody } from '@/components/ui/Card';
 import Input from '@/components/ui/Input';
@@ -21,6 +22,7 @@ export const SESSIONS = [
 ];
 
 export function SessionList({ sessions, onRevoke }) {
+  const { t } = useI18n();
   return (
     <ul>
       {sessions.map((s) => {
@@ -33,15 +35,15 @@ export function SessionList({ sessions, onRevoke }) {
             <div className="min-w-0 flex-1">
               <div className="flex flex-wrap items-center gap-2">
                 <p className="text-body-sm font-medium text-ink">{s.device}</p>
-                {s.current && <Badge tone="success" dot size="sm">This device</Badge>}
+                {s.current && <Badge tone="success" dot size="sm">{t('securityPage.thisDevice')}</Badge>}
               </div>
               <p className="mt-0.5 text-caption text-ink-3">
-                {s.location} · <span className="font-mono">{s.ip}</span> · Active {relativeTime(s.lastActive)}
+                {s.location} · <span className="font-mono">{s.ip}</span> · {t('securityPage.active', { time: relativeTime(s.lastActive) })}
               </p>
             </div>
             {!s.current && (
               <Button size="sm" variant="ghost" icon={LogOut} onClick={() => onRevoke(s)}>
-                Sign out
+                {t('securityPage.signOut')}
               </Button>
             )}
           </li>
@@ -52,6 +54,7 @@ export function SessionList({ sessions, onRevoke }) {
 }
 
 export default function SecuritySettingsPage() {
+  const { t } = useI18n();
   const dispatch = useDispatch();
   const [sessions, setSessions] = useState(SESSIONS);
   const [twoFactor, setTwoFactor] = useState(false);
@@ -64,10 +67,10 @@ export default function SecuritySettingsPage() {
   const changePassword = async (e) => {
     e.preventDefault();
     const errs = {};
-    if (!values.current) errs.current = 'Enter your current password.';
-    if (!values.next) errs.next = 'Enter a new password.';
-    else if (values.next.length < 8) errs.next = 'New password must be at least 8 characters.';
-    if (values.confirm !== values.next) errs.confirm = 'Both passwords must match.';
+    if (!values.current) errs.current = t('securityPage.errCurrent');
+    if (!values.next) errs.next = t('securityPage.errNext');
+    else if (values.next.length < 8) errs.next = t('securityPage.errNextLen');
+    if (values.confirm !== values.next) errs.confirm = t('securityPage.errMatch');
     setErrors(errs);
     if (Object.keys(errs).length) return;
 
@@ -75,22 +78,22 @@ export default function SecuritySettingsPage() {
     await new Promise((r) => setTimeout(r, 800));
     setSaving(false);
     setValues({ current: '', next: '', confirm: '' });
-    dispatch(toast.success('Password updated.', 'Use your new password next time you sign in.'));
+    dispatch(toast.success(t('toast.passwordUpdated'), t('toast.passwordUpdatedHint')));
   };
 
   const revoke = (s) => {
     setSessions((list) => list.filter((x) => x.id !== s.id));
-    dispatch(toast.success('Session ended', `${s.device} was signed out.`));
+    dispatch(toast.success(t('toast.sessionEnded'), t('toast.sessionEndedHint', { device: s.device })));
   };
 
   return (
-    <SettingsLayout title="Security" description="Protect your account and review where you're signed in." onSave={null}>
+    <SettingsLayout title={t('securityPage.title')} description={t('securityPage.description')} onSave={null}>
       <Card>
-        <CardHeader title="Password" description="Use a password you don't use anywhere else." />
+        <CardHeader title={t('securityPage.password')} description={t('securityPage.passwordHint')} />
         <CardBody>
           <form onSubmit={changePassword} noValidate className="flex max-w-md flex-col gap-4">
             <Input
-              label="Current password"
+              label={t('securityPage.currentPassword')}
               type="password"
               required
               autoComplete="current-password"
@@ -99,17 +102,17 @@ export default function SecuritySettingsPage() {
               error={errors.current}
             />
             <Input
-              label="New password"
+              label={t('securityPage.newPassword')}
               type="password"
               required
               autoComplete="new-password"
               value={values.next}
               onChange={(e) => { setValues((v) => ({ ...v, next: e.target.value })); setErrors((p) => ({ ...p, next: undefined })); }}
               error={errors.next}
-              hint={!errors.next ? 'At least 8 characters, with a number.' : undefined}
+              hint={!errors.next ? t('securityPage.passwordRule') : undefined}
             />
             <Input
-              label="Confirm new password"
+              label={t('securityPage.confirmPassword')}
               type="password"
               required
               autoComplete="new-password"
@@ -118,30 +121,30 @@ export default function SecuritySettingsPage() {
               error={errors.confirm}
             />
             <Button type="submit" variant="primary" loading={saving} className="self-start">
-              {saving ? 'Updating…' : 'Update Password'}
+              {saving ? t('securityPage.updating') : t('securityPage.updatePassword')}
             </Button>
           </form>
         </CardBody>
       </Card>
 
       <Card>
-        <CardHeader title="Security preferences" />
+        <CardHeader title={t('securityPage.prefs')} />
         <CardBody className="flex flex-col gap-5">
           <Switch
             checked={twoFactor}
             onChange={(v) => {
               setTwoFactor(v);
-              dispatch(v ? toast.success('Two-factor authentication enabled.') : toast.warning('Two-factor authentication disabled.'));
+              dispatch(v ? toast.success(t('toast.twoFactorOn')) : toast.warning(t('toast.twoFactorOff')));
             }}
-            label="Two-factor authentication"
-            description="Require a one-time code from your authenticator app when signing in."
+            label={t('securityPage.twoFactor')}
+            description={t('securityPage.twoFactorHint')}
           />
           <div className="border-t border-line pt-5">
             <Switch
               checked={alerts}
               onChange={setAlerts}
-              label="Sign-in alerts"
-              description="Email me when someone signs in from a new device."
+              label={t('securityPage.alerts')}
+              description={t('securityPage.alertsHint')}
             />
           </div>
         </CardBody>
@@ -149,12 +152,12 @@ export default function SecuritySettingsPage() {
 
       <Card>
         <CardHeader
-          title="Active sessions"
-          description={`${sessions.length} device${sessions.length === 1 ? '' : 's'} signed in`}
+          title={t('securityPage.sessions')}
+          description={sessions.length === 1 ? t('securityPage.sessionsHintOne') : t('securityPage.sessionsHint', { n: sessions.length })}
           action={
             sessions.length > 1 && (
               <Button size="sm" variant="ghost" className="text-danger-text" onClick={() => setConfirmRevokeAll(true)}>
-                Sign out everywhere
+                {t('securityPage.signOutEverywhere')}
               </Button>
             )
           }
@@ -168,11 +171,11 @@ export default function SecuritySettingsPage() {
         onConfirm={() => {
           setSessions((list) => list.filter((s) => s.current));
           setConfirmRevokeAll(false);
-          dispatch(toast.success('Signed out everywhere', 'All other devices have been signed out.'));
+          dispatch(toast.success(t('toast.signedOutAll'), t('toast.signedOutAllHint')));
         }}
-        title="Sign out of all other devices?"
-        message="You'll stay signed in here, but every other session will be ended immediately. Anyone using those devices will need to sign in again."
-        confirmLabel="Sign out everywhere"
+        title={t('confirm.signOutAll')}
+        message={t('confirm.signOutAllMsg')}
+        confirmLabel={t('confirm.signOutAllConfirm')}
         tone="danger"
       />
     </SettingsLayout>

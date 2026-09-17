@@ -2,6 +2,7 @@
 
 import { Plus, Truck, Pencil, Trash2 } from 'lucide-react';
 import { currency } from '@/lib/format';
+import { useI18n } from '@/i18n/I18nProvider';
 import { useSettingsSection } from '@/lib/settingsStore';
 import SettingsLayout from '@/components/layout/SettingsLayout';
 import Card, { CardHeader, CardBody } from '@/components/ui/Card';
@@ -13,37 +14,49 @@ import Switch from '@/components/ui/Switch';
 import { Table, TableWrap, TBody, TD, TH, THead, TR } from '@/components/ui/Table';
 
 const METHODS = [
-  { id: 'std', name: 'Standard Shipping', time: '4–6 business days', price: 6.9, regions: 'EU, UK', active: true },
-  { id: 'exp', name: 'Express Shipping', time: '1–2 business days', price: 14.9, regions: 'EU, UK', active: true },
-  { id: 'intl', name: 'International', time: '7–14 business days', price: 24.9, regions: 'Worldwide', active: true },
-  { id: 'pickup', name: 'Local Pickup', time: 'Same day', price: 0, regions: 'Frankfurt', active: false },
+  { id: 'std', nameKey: 'settingsPages.std', timeKey: 'settingsPages.stdTime', price: 6.9, regionsKey: 'settingsPages.regionsEuUk', active: true },
+  { id: 'exp', nameKey: 'settingsPages.exp', timeKey: 'settingsPages.expTime', price: 14.9, regionsKey: 'settingsPages.regionsEuUk', active: true },
+  { id: 'intl', nameKey: 'settingsPages.intl', timeKey: 'settingsPages.intlTime', price: 24.9, regionsKey: 'settingsPages.regionsWorld', active: true },
+  { id: 'pickup', nameKey: 'settingsPages.pickup', timeKey: 'settingsPages.pickupTime', price: 0, regionsKey: 'settingsPages.regionsFra', active: false },
+];
+
+const REGION_KEYS = [
+  'settingsPages.regionEU',
+  'settingsPages.regionGB',
+  'settingsPages.regionCH',
+  'settingsPages.regionNO',
+  'settingsPages.regionUS',
+  'settingsPages.regionCA',
+  'settingsPages.regionAU',
+  'settingsPages.regionJP',
 ];
 
 export default function ShippingSettingsPage() {
+  const { t } = useI18n();
   const { form, patch, setForm, dirty, setDirty, save } = useSettingsSection('shipping');
 
   return (
     <SettingsLayout
-      title="Shipping"
-      description="Methods, regions and what customers pay for delivery."
+      title={t('settingsPages.shippingTitle')}
+      description={t('settingsPages.shippingHint')}
       dirty={dirty}
       onSave={save}
     >
       <Card>
         <CardHeader
-          title="Shipping methods"
-          description="Options shown at checkout."
-          action={<Button size="sm" variant="secondary" icon={Plus}>Add method</Button>}
+          title={t('settingsPages.methods')}
+          description={t('settingsPages.methodsHint')}
+          action={<Button size="sm" variant="secondary" icon={Plus}>{t('settingsPages.addMethod')}</Button>}
         />
         <TableWrap>
           <Table>
             <THead>
               <tr>
-                <TH className="min-w-[200px]">Method</TH>
-                <TH className="hidden sm:table-cell">Regions</TH>
-                <TH align="right">Rate</TH>
-                <TH>Status</TH>
-                <TH width="90px" align="right"><span className="sr-only">Actions</span></TH>
+                <TH className="min-w-[200px]">{t('settingsPages.colMethod')}</TH>
+                <TH className="hidden sm:table-cell">{t('settingsPages.colRegions')}</TH>
+                <TH align="right">{t('settingsPages.colRate')}</TH>
+                <TH>{t('settingsPages.colStatus')}</TH>
+                <TH width="90px" align="right"><span className="sr-only">{t('table.actions')}</span></TH>
               </tr>
             </THead>
             <TBody>
@@ -55,24 +68,24 @@ export default function ShippingSettingsPage() {
                         <Truck aria-hidden className="h-4 w-4 text-ink-2" />
                       </span>
                       <div>
-                        <p className="text-body-sm font-semibold text-ink">{m.name}</p>
-                        <p className="text-caption text-ink-3">{m.time}</p>
+                        <p className="text-body-sm font-semibold text-ink">{t(m.nameKey)}</p>
+                        <p className="text-caption text-ink-3">{t(m.timeKey)}</p>
                       </div>
                     </div>
                   </TD>
-                  <TD muted className="hidden sm:table-cell">{m.regions}</TD>
+                  <TD muted className="hidden sm:table-cell">{t(m.regionsKey)}</TD>
                   <TD align="right" numeric strong>
-                    {m.price === 0 ? 'Free' : currency(m.price)}
+                    {m.price === 0 ? t('settingsPages.free') : currency(m.price)}
                   </TD>
                   <TD>
                     <Badge tone={m.active ? 'success' : 'neutral'} dot size="sm">
-                      {m.active ? 'Active' : 'Disabled'}
+                      {m.active ? t('status.active') : t('status.disabled')}
                     </Badge>
                   </TD>
                   <TD align="right">
                     <div className="flex items-center justify-end gap-1">
-                      <IconButton icon={Pencil} size="sm" label={`Edit ${m.name}`} />
-                      <IconButton icon={Trash2} size="sm" variant="danger" label={`Delete ${m.name}`} />
+                      <IconButton icon={Pencil} size="sm" label={t('common.edit')} />
+                      <IconButton icon={Trash2} size="sm" variant="danger" label={t('common.delete')} />
                     </div>
                   </TD>
                 </TR>
@@ -83,25 +96,25 @@ export default function ShippingSettingsPage() {
       </Card>
 
       <Card>
-        <CardHeader title="Free shipping" description="Reward larger baskets." />
+        <CardHeader title={t('settingsPages.freeTitle')} description={t('settingsPages.freeCardHint')} />
         <CardBody className="flex flex-col gap-5">
           <Switch
             checked={form.freeEnabled}
             onChange={(v) => { setForm((f) => ({ ...f, freeEnabled: v })); setDirty(true); }}
-            label="Offer free shipping above a threshold"
-            description="Applies to standard shipping only."
+            label={t('settingsPages.freeSwitch')}
+            description={t('settingsPages.freeSwitchHint')}
           />
           {form.freeEnabled && (
             <div className="border-t border-line pt-5">
               <Input
-                label="Free shipping threshold"
+                label={t('settingsPages.freeThreshold')}
                 type="number"
                 min="0"
                 prefix="$"
                 className="pl-7 sm:max-w-xs"
                 value={form.freeThreshold}
                 onChange={patch('freeThreshold')}
-                hint={`Orders over ${currency(parseFloat(form.freeThreshold) || 0, { decimals: 0 })} ship free.`}
+                hint={t('settingsPages.freeOver', { amount: currency(parseFloat(form.freeThreshold) || 0, { decimals: 0 }) })}
               />
             </div>
           )}
@@ -109,14 +122,14 @@ export default function ShippingSettingsPage() {
       </Card>
 
       <Card>
-        <CardHeader title="Shipping regions" description="Where you deliver." />
+        <CardHeader title={t('settingsPages.regionsTitle')} description={t('settingsPages.regionsHint')} />
         <CardBody>
           <div className="flex flex-wrap gap-2">
-            {['European Union', 'United Kingdom', 'Switzerland', 'Norway', 'United States', 'Canada', 'Australia', 'Japan'].map((r) => (
-              <Badge key={r} tone="outline">{r}</Badge>
+            {REGION_KEYS.map((key) => (
+              <Badge key={key} tone="outline">{t(key)}</Badge>
             ))}
           </div>
-          <Button size="sm" variant="secondary" icon={Plus} className="mt-4">Add region</Button>
+          <Button size="sm" variant="secondary" icon={Plus} className="mt-4">{t('settingsPages.addRegion')}</Button>
         </CardBody>
       </Card>
     </SettingsLayout>
