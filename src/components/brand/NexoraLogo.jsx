@@ -12,9 +12,9 @@ export default function NexoraLogo({ compact = false, className, alt = "Nexora A
 
   if (compact) {
     return (
-      <span className={cn("relative inline-flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-[9px]", className)} aria-hidden>
+      <span className={cn("relative inline-flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-[9px]", className)} aria-hidden>
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/brand/nexora-mark.webp" alt="" className="h-10 w-10 object-contain" />
+        <img src="/brand/nexora-mark.webp" alt="" className="h-9 w-9 object-contain" />
       </span>
     );
   }

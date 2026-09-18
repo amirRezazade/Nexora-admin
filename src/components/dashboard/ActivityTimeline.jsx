@@ -1,28 +1,27 @@
-'use client';
+"use client";
 
-import Link from 'next/link';
-import {
-  ShoppingCart, Package, UserPlus, Star, AlertTriangle, Activity as ActivityIcon,
-} from 'lucide-react';
-import { currency, relativeTime } from '@/lib/format';
-import { useI18n } from '@/i18n/I18nProvider';
-import Card, { CardHeader } from '@/components/ui/Card';
-import Timeline, { TimelineItem } from '@/components/ui/Timeline';
-import EmptyState from '@/components/ui/EmptyState';
-import Skeleton from '@/components/ui/Skeleton';
+import Link from "next/link";
+import { ShoppingCart, Package, UserPlus, Star, AlertTriangle, Activity as ActivityIcon } from "lucide-react";
+import { currency, relativeTime } from "@/lib/format";
+import { useI18n } from "@/i18n/I18nProvider";
+import Card, { CardHeader } from "@/components/ui/Card";
+import Timeline, { TimelineItem } from "@/components/ui/Timeline";
+import EmptyState from "@/components/ui/EmptyState";
+import Skeleton from "@/components/ui/Skeleton";
 
 const TYPE_CONFIG = {
-  order: { icon: ShoppingCart, tone: 'info' },
-  product: { icon: Package, tone: 'brand' },
-  inventory: { icon: AlertTriangle, tone: 'warning' },
-  customer: { icon: UserPlus, tone: 'success' },
-  review: { icon: Star, tone: 'muted' },
+  order: { icon: ShoppingCart, tone: "info" },
+  product: { icon: Package, tone: "brand" },
+  inventory: { icon: AlertTriangle, tone: "warning" },
+  customer: { icon: UserPlus, tone: "success" },
+  review: { icon: Star, tone: "muted" },
 };
 
-export default function ActivityTimeline({ items = [], loading, title = 'Recent Activity', description = 'What has happened across your store' }) {
+export default function ActivityTimeline({ items = [], loading, title, description }) {
+  const { t } = useI18n();
   return (
     <Card className="flex h-full flex-col">
-      <CardHeader title={title} description={description} />
+      <CardHeader title={title || t("widgets.activity")} description={description || t("widgets.activityHint")} />
       <div className="flex-1 px-5 py-5 sm:px-6">
         {loading ? (
           <div className="flex flex-col gap-5">
@@ -37,7 +36,7 @@ export default function ActivityTimeline({ items = [], loading, title = 'Recent 
             ))}
           </div>
         ) : items.length === 0 ? (
-          <EmptyState compact icon={ActivityIcon} title={t('widgets.noActivity')} description={t('widgets.activityHint')} />
+          <EmptyState compact icon={ActivityIcon} title={t("widgets.noActivity")} description={t("widgets.activityHint")} />
         ) : (
           <Timeline>
             {items.map((item, i) => {
@@ -56,10 +55,7 @@ export default function ActivityTimeline({ items = [], loading, title = 'Recent 
                   meta={relativeTime(item.at)}
                   title={
                     item.href ? (
-                      <Link
-                        href={item.href}
-                        className="rounded underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
-                      >
+                      <Link href={item.href} className="rounded underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand">
                         {body}
                       </Link>
                     ) : (
