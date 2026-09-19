@@ -74,7 +74,9 @@ function CategoryDialog({ open, onClose, category, parents }) {
       }
       onClose();
     } catch (err) {
-      setErrors(typeof err === "object" ? err : { name: t("common.tryAgain") });
+      const fieldErrors = err && typeof err === "object" ? err : { name: t("common.tryAgain") };
+      setErrors(fieldErrors);
+      dispatch(toast.error(t("toast.categorySaveError"), fieldErrors.name || t("common.tryAgain")));
     } finally {
       setSaving(false);
     }
@@ -91,13 +93,13 @@ function CategoryDialog({ open, onClose, category, parents }) {
           <Button variant="secondary" onClick={onClose} disabled={saving}>
             {t("common.cancel")}
           </Button>
-          <Button variant="primary" onClick={submit} loading={saving}>
+          <Button type="submit" form="category-dialog-form" variant="primary" loading={saving}>
             {saving ? t("common.saving") : editing ? t("common.save") : t("form.addCategory")}
           </Button>
         </>
       }
     >
-      <form onSubmit={submit} className="flex flex-col gap-4 pb-2">
+      <form id="category-dialog-form" onSubmit={submit} className="flex flex-col gap-4 pb-2">
         <Input
           label={t("form.name")}
           required
@@ -324,7 +326,7 @@ export default function CategoriesPage() {
           </TableWrap>
         )}
 
-        <Pagination page={page} totalPages={totalPages} total={total} pageSize={pageSize} itemLabel="categories" onPageChange={(p) => dispatch(setPage(p))} />
+        <Pagination page={page} totalPages={totalPages} total={total} pageSize={pageSize} itemLabel={t("categoriesPage.itemLabel")} onPageChange={(p) => dispatch(setPage(p))} />
       </Card>
 
       <CategoryDialog open={dialog.open} category={dialog.category} parents={topLevel} onClose={() => setDialog({ open: false, category: null })} />

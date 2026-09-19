@@ -1,24 +1,24 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { useDispatch } from 'react-redux';
-import { Monitor, Smartphone, Tablet, LogOut } from 'lucide-react';
-import { relativeTime } from '@/lib/format';
-import { toast } from '@/store/slices/uiSlice';
-import { useI18n } from '@/i18n/I18nProvider';
-import SettingsLayout from '@/components/layout/SettingsLayout';
-import Card, { CardHeader, CardBody } from '@/components/ui/Card';
-import Input from '@/components/ui/Input';
-import Button from '@/components/ui/Button';
-import Switch from '@/components/ui/Switch';
-import Badge from '@/components/ui/Badge';
-import { ConfirmDialog } from '@/components/ui/Modal';
+import { useState } from "react";
+import { useDispatch } from "react-redux";
+import { Monitor, Smartphone, Tablet, LogOut } from "lucide-react";
+import { relativeTime } from "@/lib/format";
+import { toast } from "@/store/slices/uiSlice";
+import { useI18n } from "@/i18n/I18nProvider";
+import SettingsLayout from "@/components/layout/SettingsLayout";
+import Card, { CardHeader, CardBody } from "@/components/ui/Card";
+import Input from "@/components/ui/Input";
+import Button from "@/components/ui/Button";
+import Switch from "@/components/ui/Switch";
+import Badge from "@/components/ui/Badge";
+import { ConfirmDialog } from "@/components/ui/Modal";
 
 export const SESSIONS = [
-  { id: 's1', device: 'MacBook Pro · Chrome', location: 'Frankfurt, Germany', ip: '84.132.44.19', lastActive: '2026-08-21T11:52:00Z', current: true, icon: Monitor },
-  { id: 's2', device: 'iPhone 15 · Safari', location: 'Frankfurt, Germany', ip: '84.132.44.19', lastActive: '2026-08-21T07:14:00Z', current: false, icon: Smartphone },
-  { id: 's3', device: 'iPad Air · Safari', location: 'Berlin, Germany', ip: '91.44.201.8', lastActive: '2026-08-18T19:33:00Z', current: false, icon: Tablet },
-  { id: 's4', device: 'Windows PC · Edge', location: 'Amsterdam, Netherlands', ip: '145.28.11.204', lastActive: '2026-08-12T09:05:00Z', current: false, icon: Monitor },
+  { id: "s1", device: "MacBook Pro · Chrome", location: "Frankfurt, Germany", ip: "84.132.44.19", lastActive: "2026-08-21T11:52:00Z", current: true, icon: Monitor },
+  { id: "s2", device: "iPhone 15 · Safari", location: "Frankfurt, Germany", ip: "84.132.44.19", lastActive: "2026-08-21T07:14:00Z", current: false, icon: Smartphone },
+  { id: "s3", device: "iPad Air · Safari", location: "Berlin, Germany", ip: "91.44.201.8", lastActive: "2026-08-18T19:33:00Z", current: false, icon: Tablet },
+  { id: "s4", device: "Windows PC · Edge", location: "Amsterdam, Netherlands", ip: "145.28.11.204", lastActive: "2026-08-12T09:05:00Z", current: false, icon: Monitor },
 ];
 
 export function SessionList({ sessions, onRevoke }) {
@@ -35,15 +35,19 @@ export function SessionList({ sessions, onRevoke }) {
             <div className="min-w-0 flex-1">
               <div className="flex flex-wrap items-center gap-2">
                 <p className="text-body-sm font-medium text-ink">{s.device}</p>
-                {s.current && <Badge tone="success" dot size="sm">{t('securityPage.thisDevice')}</Badge>}
+                {s.current && (
+                  <Badge tone="success" dot size="sm">
+                    {t("securityPage.thisDevice")}
+                  </Badge>
+                )}
               </div>
               <p className="mt-0.5 text-caption text-ink-3">
-                {s.location} · <span className="font-mono">{s.ip}</span> · {t('securityPage.active', { time: relativeTime(s.lastActive) })}
+                {s.location} · <span className="font-mono">{s.ip}</span> · {t("securityPage.active", { time: relativeTime(s.lastActive) })}
               </p>
             </div>
             {!s.current && (
               <Button size="sm" variant="ghost" icon={LogOut} onClick={() => onRevoke(s)}>
-                {t('securityPage.signOut')}
+                {t("securityPage.signOut")}
               </Button>
             )}
           </li>
@@ -61,103 +65,107 @@ export default function SecuritySettingsPage() {
   const [alerts, setAlerts] = useState(true);
   const [confirmRevokeAll, setConfirmRevokeAll] = useState(false);
   const [errors, setErrors] = useState({});
-  const [values, setValues] = useState({ current: '', next: '', confirm: '' });
+  const [values, setValues] = useState({ current: "", next: "", confirm: "" });
   const [saving, setSaving] = useState(false);
 
   const changePassword = async (e) => {
     e.preventDefault();
     const errs = {};
-    if (!values.current) errs.current = t('securityPage.errCurrent');
-    if (!values.next) errs.next = t('securityPage.errNext');
-    else if (values.next.length < 8) errs.next = t('securityPage.errNextLen');
-    if (values.confirm !== values.next) errs.confirm = t('securityPage.errMatch');
+    if (!values.current) errs.current = t("securityPage.errCurrent");
+    if (!values.next) errs.next = t("securityPage.errNext");
+    else if (values.next.length < 8) errs.next = t("securityPage.errNextLen");
+    if (values.confirm !== values.next) errs.confirm = t("securityPage.errMatch");
     setErrors(errs);
     if (Object.keys(errs).length) return;
 
     setSaving(true);
     await new Promise((r) => setTimeout(r, 800));
     setSaving(false);
-    setValues({ current: '', next: '', confirm: '' });
-    dispatch(toast.success(t('toast.passwordUpdated'), t('toast.passwordUpdatedHint')));
+    setValues({ current: "", next: "", confirm: "" });
+    dispatch(toast.success(t("toast.passwordUpdated"), t("toast.passwordUpdatedHint")));
   };
 
   const revoke = (s) => {
     setSessions((list) => list.filter((x) => x.id !== s.id));
-    dispatch(toast.success(t('toast.sessionEnded'), t('toast.sessionEndedHint', { device: s.device })));
+    dispatch(toast.success(t("toast.sessionEnded"), t("toast.sessionEndedHint", { device: s.device })));
   };
 
   return (
-    <SettingsLayout title={t('securityPage.title')} description={t('securityPage.description')} onSave={null}>
+    <SettingsLayout title={t("securityPage.title")} description={t("securityPage.description")} onSave={null}>
       <Card>
-        <CardHeader title={t('securityPage.password')} description={t('securityPage.passwordHint')} />
+        <CardHeader title={t("securityPage.password")} description={t("securityPage.passwordHint")} />
         <CardBody>
           <form onSubmit={changePassword} noValidate className="flex max-w-md flex-col gap-4">
             <Input
-              label={t('securityPage.currentPassword')}
+              label={t("securityPage.currentPassword")}
               type="password"
               required
               autoComplete="current-password"
               value={values.current}
-              onChange={(e) => { setValues((v) => ({ ...v, current: e.target.value })); setErrors((p) => ({ ...p, current: undefined })); }}
+              onChange={(e) => {
+                setValues((v) => ({ ...v, current: e.target.value }));
+                setErrors((p) => ({ ...p, current: undefined }));
+              }}
               error={errors.current}
             />
             <Input
-              label={t('securityPage.newPassword')}
+              label={t("securityPage.newPassword")}
               type="password"
               required
               autoComplete="new-password"
               value={values.next}
-              onChange={(e) => { setValues((v) => ({ ...v, next: e.target.value })); setErrors((p) => ({ ...p, next: undefined })); }}
+              onChange={(e) => {
+                setValues((v) => ({ ...v, next: e.target.value }));
+                setErrors((p) => ({ ...p, next: undefined }));
+              }}
               error={errors.next}
-              hint={!errors.next ? t('securityPage.passwordRule') : undefined}
+              hint={!errors.next ? t("securityPage.passwordRule") : undefined}
             />
             <Input
-              label={t('securityPage.confirmPassword')}
+              label={t("securityPage.confirmPassword")}
               type="password"
               required
               autoComplete="new-password"
               value={values.confirm}
-              onChange={(e) => { setValues((v) => ({ ...v, confirm: e.target.value })); setErrors((p) => ({ ...p, confirm: undefined })); }}
+              onChange={(e) => {
+                setValues((v) => ({ ...v, confirm: e.target.value }));
+                setErrors((p) => ({ ...p, confirm: undefined }));
+              }}
               error={errors.confirm}
             />
             <Button type="submit" variant="primary" loading={saving} className="self-start">
-              {saving ? t('securityPage.updating') : t('securityPage.updatePassword')}
+              {saving ? t("securityPage.updating") : t("securityPage.updatePassword")}
             </Button>
           </form>
         </CardBody>
       </Card>
 
       <Card>
-        <CardHeader title={t('securityPage.prefs')} />
+        <CardHeader title={t("securityPage.prefs")} />
         <CardBody className="flex flex-col gap-5">
           <Switch
             checked={twoFactor}
             onChange={(v) => {
               setTwoFactor(v);
-              dispatch(v ? toast.success(t('toast.twoFactorOn')) : toast.warning(t('toast.twoFactorOff')));
+              dispatch(v ? toast.success(t("toast.twoFactorOn")) : toast.warning(t("toast.twoFactorOff")));
             }}
-            label={t('securityPage.twoFactor')}
-            description={t('securityPage.twoFactorHint')}
+            label={t("securityPage.twoFactor")}
+            description={t("securityPage.twoFactorHint")}
           />
           <div className="border-t border-line pt-5">
-            <Switch
-              checked={alerts}
-              onChange={setAlerts}
-              label={t('securityPage.alerts')}
-              description={t('securityPage.alertsHint')}
-            />
+            <Switch checked={alerts} onChange={setAlerts} label={t("securityPage.alerts")} description={t("securityPage.alertsHint")} />
           </div>
         </CardBody>
       </Card>
 
       <Card>
         <CardHeader
-          title={t('securityPage.sessions')}
-          description={sessions.length === 1 ? t('securityPage.sessionsHintOne') : t('securityPage.sessionsHint', { n: sessions.length })}
+          title={t("securityPage.sessions")}
+          description={sessions.length === 1 ? t("securityPage.sessionsHintOne") : t("securityPage.sessionsHint", { n: sessions.length })}
           action={
             sessions.length > 1 && (
               <Button size="sm" variant="ghost" className="text-danger-text" onClick={() => setConfirmRevokeAll(true)}>
-                {t('securityPage.signOutEverywhere')}
+                {t("securityPage.signOutEverywhere")}
               </Button>
             )
           }
@@ -171,11 +179,11 @@ export default function SecuritySettingsPage() {
         onConfirm={() => {
           setSessions((list) => list.filter((s) => s.current));
           setConfirmRevokeAll(false);
-          dispatch(toast.success(t('toast.signedOutAll'), t('toast.signedOutAllHint')));
+          dispatch(toast.success(t("toast.signedOutAll"), t("toast.signedOutAllHint")));
         }}
-        title={t('confirm.signOutAll')}
-        message={t('confirm.signOutAllMsg')}
-        confirmLabel={t('confirm.signOutAllConfirm')}
+        title={t("confirm.signOutAll")}
+        message={t("confirm.signOutAllMsg")}
+        confirmLabel={t("confirm.signOutAllConfirm")}
         tone="danger"
       />
     </SettingsLayout>

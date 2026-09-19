@@ -1,15 +1,15 @@
-'use client';
+"use client";
 
-import { cloneElement, useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
-import { createPortal } from 'react-dom';
-import { cn } from '@/lib/format';
-import { useEscape } from '@/lib/hooks';
+import { cloneElement, useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
+import { cn } from "@/lib/format";
+import { useEscape } from "@/lib/hooks";
 
 /**
  * Floating surface portaled to `document.body` so RTL / viewport edges never
  * create a horizontal scrollbar on the page.
  */
-export default function Popover({ trigger, children, align = 'end', className, width = 'w-72' }) {
+export default function Popover({ trigger, children, align = "end", className, width = "w-72" }) {
   const [open, setOpen] = useState(false);
   const [coords, setCoords] = useState({ top: 0, left: 0 });
   const triggerWrapRef = useRef(null);
@@ -30,8 +30,8 @@ export default function Popover({ trigger, children, align = 'end', className, w
     const openUp = spaceBelow < Math.min(panelH + 12, 280) && r.top > spaceBelow;
 
     let left;
-    if (align === 'start') left = r.left;
-    else if (align === 'center') left = r.left + r.width / 2 - panelW / 2;
+    if (align === "start") left = r.left;
+    else if (align === "center") left = r.left + r.width / 2 - panelW / 2;
     else left = r.right - panelW;
 
     const pad = 8;
@@ -53,34 +53,25 @@ export default function Popover({ trigger, children, align = 'end', className, w
       close();
     };
     const onReposition = () => place();
-    document.addEventListener('mousedown', onDoc);
-    document.addEventListener('touchstart', onDoc);
-    window.addEventListener('resize', onReposition);
-    window.addEventListener('scroll', onReposition, true);
+    document.addEventListener("mousedown", onDoc);
+    document.addEventListener("touchstart", onDoc);
+    window.addEventListener("resize", onReposition);
+    window.addEventListener("scroll", onReposition, true);
     return () => {
-      document.removeEventListener('mousedown', onDoc);
-      document.removeEventListener('touchstart', onDoc);
-      window.removeEventListener('resize', onReposition);
-      window.removeEventListener('scroll', onReposition, true);
+      document.removeEventListener("mousedown", onDoc);
+      document.removeEventListener("touchstart", onDoc);
+      window.removeEventListener("resize", onReposition);
+      window.removeEventListener("scroll", onReposition, true);
     };
   }, [open, close, place]);
 
   const panel =
-    open && typeof document !== 'undefined'
+    open && typeof document !== "undefined"
       ? createPortal(
-          <div
-            ref={panelRef}
-            role="dialog"
-            style={{ position: 'fixed', top: coords.top, left: coords.left }}
-            className={cn(
-              'z-[80] max-h-[min(420px,calc(100vh-16px))] max-w-[calc(100vw-1.5rem)] overflow-x-hidden overflow-y-auto rounded-card-lg border border-line bg-surface shadow-lg animate-pop-in',
-              width,
-              className
-            )}
-          >
-            {typeof children === 'function' ? children({ close }) : children}
+          <div ref={panelRef} role="dialog" style={{ position: "fixed", top: coords.top, left: coords.left }} className={cn("z-80 max-h-[min(420px,calc(100vh-16px))] max-w-[calc(100vw-1.5rem)] overflow-x-hidden overflow-y-auto rounded-card-lg border border-line bg-surface shadow-lg animate-pop-in", width, className)}>
+            {typeof children === "function" ? children({ close }) : children}
           </div>,
-          document.body
+          document.body,
         )
       : null;
 
@@ -91,8 +82,8 @@ export default function Popover({ trigger, children, align = 'end', className, w
           trigger.props.onClick?.(e);
           setOpen((v) => !v);
         },
-        'aria-haspopup': 'dialog',
-        'aria-expanded': open,
+        "aria-haspopup": "dialog",
+        "aria-expanded": open,
       })}
       {panel}
     </div>

@@ -402,38 +402,40 @@ async function createCategory(body) {
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, "-")
     .slice(0, 20)}`;
-  const { data, error } = await supabase
-    .from("categories")
-    .insert({
-      id,
-      name: body.name.trim(),
-      name_fa: body.nameFa || null,
-      slug: body.slug || body.name.toLowerCase().replace(/[^a-z0-9]+/g, "-"),
-      parent_id: body.parentId || null,
-      status: body.status || "active",
-      description: body.description || "",
-    })
-    .select("*")
-    .single();
+  const row = {
+    id,
+    name: body.name.trim(),
+    name_fa: body.nameFa || null,
+    slug: body.slug || body.name.toLowerCase().replace(/[^a-z0-9]+/g, "-"),
+    parent_id: body.parentId || null,
+    status: body.status || "active",
+    description: body.description || "",
+    description_fa: body.descriptionFa || null,
+  };
+  let { data, error } = await supabase.from("categories").insert(row).select("*").single();
+  if (error && /description_fa/i.test(error.message || "")) {
+    delete row.description_fa;
+    ({ data, error } = await supabase.from("categories").insert(row).select("*").single());
+  }
   if (error) throw new ApiError(error.message, 422, { errors: { name: error.message } });
   return { data: mapCategory(data) };
 }
 
 async function updateCategory(id, body) {
-  const { data, error } = await supabase
-    .from("categories")
-    .update({
-      name: body.name,
-      name_fa: body.nameFa ?? body.name_fa,
-      slug: body.slug,
-      parent_id: body.parentId ?? body.parent_id ?? null,
-      status: body.status,
-      description: body.description,
-      description_fa: body.descriptionFa ?? body.description_fa,
-    })
-    .eq("id", id)
-    .select("*")
-    .single();
+  const patch = {
+    name: body.name,
+    name_fa: body.nameFa ?? body.name_fa ?? null,
+    slug: body.slug,
+    parent_id: body.parentId || body.parent_id || null,
+    status: body.status,
+    description: body.description ?? "",
+    description_fa: body.descriptionFa ?? body.description_fa ?? null,
+  };
+  let { data, error } = await supabase.from("categories").update(patch).eq("id", id).select("*").single();
+  if (error && /description_fa/i.test(error.message || "")) {
+    delete patch.description_fa;
+    ({ data, error } = await supabase.from("categories").update(patch).eq("id", id).select("*").single());
+  }
   if (error) throw new ApiError(error.message);
   return { data: mapCategory(data) };
 }

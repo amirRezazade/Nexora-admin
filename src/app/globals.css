@@ -166,9 +166,6 @@
     transition-duration: 180ms;
     transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
   }
-  button {
-    cursor: pointer;
-  }
 
   /* Never animate on first paint or during layout-driven changes */
   .no-theme-transition,
@@ -244,6 +241,9 @@
   .dark .skeleton::after {
     background-image: linear-gradient(90deg, transparent, rgb(255 255 255 / 0.05), transparent);
   }
+  button {
+    cursor: pointer;
+  }
 
   /* Card primitive */
   .card {
@@ -287,18 +287,7 @@
 }
 .nexora-gallery .swiper-button-next,
 .nexora-gallery .swiper-button-prev {
-  width: 32px;
-  height: 32px;
-  border-radius: 8px;
-  background: rgb(var(--c-surface) / 0.95);
-  border: 1px solid rgb(var(--c-line-strong));
-  color: rgb(var(--c-ink));
-  box-shadow: var(--shadow-xs);
-}
-.nexora-gallery .swiper-button-next::after,
-.nexora-gallery .swiper-button-prev::after {
-  font-size: 12px;
-  font-weight: 700;
+  display: none;
 }
 .nexora-gallery .swiper-pagination-bullet {
   background: rgb(var(--c-ink-3));

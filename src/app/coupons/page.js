@@ -69,14 +69,14 @@ function CouponDialog({ open, onClose, coupon, onSaved }) {
   const submit = async (e) => {
     e.preventDefault();
     const errs = {};
-    if (!values.code.trim()) errs.code = "Coupon code is required.";
+    if (!values.code.trim()) errs.code = t("validation.couponCode");
     if (values.type !== "free_shipping") {
-      if (!values.value) errs.value = "Enter a discount value.";
-      else if (!(parseFloat(values.value) > 0)) errs.value = "Discount value must be greater than 0.";
-      else if (values.type === "percentage" && parseFloat(values.value) > 100) errs.value = "A percentage discount cannot exceed 100%.";
+      if (!values.value) errs.value = t("validation.discountValue");
+      else if (!(parseFloat(values.value) > 0)) errs.value = t("validation.discountPositive");
+      else if (values.type === "percentage" && parseFloat(values.value) > 100) errs.value = t("validation.percentMax");
     }
-    if (!values.expiresAt) errs.expiresAt = "Choose an expiration date.";
-    if (values.startsAt && values.expiresAt && values.startsAt > values.expiresAt) errs.expiresAt = "The expiration date must be after the start date.";
+    if (!values.expiresAt) errs.expiresAt = t("validation.expiresRequired");
+    if (values.startsAt && values.expiresAt && values.startsAt > values.expiresAt) errs.expiresAt = t("validation.expiresAfter");
     setErrors(errs);
     if (Object.keys(errs).length) return;
 
@@ -447,7 +447,7 @@ export default function CouponsPage() {
                                   toggleStatus(c);
                                 }}
                               >
-                                {c.status === "disabled" ? "Enable" : "Disable"}
+                                {c.status === "disabled" ? t("common.enable") : t("common.disable")}
                               </MenuItem>
                               <MenuSeparator />
                               <MenuItem

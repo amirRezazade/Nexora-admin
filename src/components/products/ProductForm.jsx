@@ -127,17 +127,17 @@ export default function ProductForm({ mode = "create", initial = null, productId
      but the server remains the source of truth. */
   const validate = () => {
     const e = {};
-    if (!values.name.trim()) e.name = "Product name is required.";
-    else if (values.name.trim().length < 3) e.name = "Product name must be at least 3 characters.";
-    if (!values.sku.trim()) e.sku = "SKU is required.";
-    if (!values.categoryId) e.categoryId = "Select a category.";
-    if (values.price === "" || values.price == null) e.price = "Price is required.";
-    else if (!(parseFloat(values.price) > 0)) e.price = "Price must be greater than 0.";
-    if (values.compareAt && parseFloat(values.compareAt) <= parseFloat(values.price)) e.compareAt = "Compare-at price must be higher than the price.";
-    if (values.cost && parseFloat(values.cost) < 0) e.cost = "Cost can’t be negative.";
-    if (values.stock === "" || values.stock == null) e.stock = "Enter a stock quantity of 0 or more.";
-    else if (parseInt(values.stock, 10) < 0) e.stock = "Stock can’t be negative.";
-    if (values.metaDescription && values.metaDescription.length > 160) e.metaDescription = "Meta description should be 160 characters or fewer.";
+    if (!values.name.trim()) e.name = t("validation.nameRequired");
+    else if (values.name.trim().length < 3) e.name = t("validation.nameMin");
+    if (!values.sku.trim()) e.sku = t("validation.skuRequired");
+    if (!values.categoryId) e.categoryId = t("validation.categoryRequired");
+    if (values.price === "" || values.price == null) e.price = t("validation.priceRequired");
+    else if (!(parseFloat(values.price) > 0)) e.price = t("validation.pricePositive");
+    if (values.compareAt && parseFloat(values.compareAt) <= parseFloat(values.price)) e.compareAt = t("validation.compareAt");
+    if (values.cost && parseFloat(values.cost) < 0) e.cost = t("validation.costNegative");
+    if (values.stock === "" || values.stock == null) e.stock = t("validation.stockRequired");
+    else if (parseInt(values.stock, 10) < 0) e.stock = t("validation.stockNegative");
+    if (values.metaDescription && values.metaDescription.length > 160) e.metaDescription = t("validation.metaMax");
     return e;
   };
 
@@ -211,7 +211,7 @@ export default function ProductForm({ mode = "create", initial = null, productId
       {/* Error summary — one place to see everything that needs fixing */}
       {errorList.length > 0 && (
         <div ref={errorSummaryRef} tabIndex={-1} className="focus:outline-none">
-          <Alert tone="danger" title={`${errorList.length} field${errorList.length === 1 ? "" : "s"} need${errorList.length === 1 ? "s" : ""} attention`}>
+          <Alert tone="danger" title={errorList.length === 1 ? t("validation.fieldNeed") : t("validation.fieldsNeed", { n: errorList.length })}>
             <ul className="mt-1 list-inside list-disc space-y-0.5">
               {errorList.map(([key, msg]) => (
                 <li key={key}>{msg}</li>
@@ -357,8 +357,9 @@ export default function ProductForm({ mode = "create", initial = null, productId
             )}
           </FormSection>
 
-          <FormSection isMobile={isMobile} id="description" title={t("form.description")} description="Tell customers what makes this product worth buying" icon={FileText}>
-            <Textarea label={t("form.description")} rows={7} placeholder="Describe the material, fit, features and anything a customer would want to know before buying." value={values.description ?? ""} onChange={set("description")} hint="Plain text. Keep it scannable — customers skim." />
+          <FormSection isMobile={isMobile} id="description" title={t("form.description")} description={t("form.descriptionHint")} icon={FileText}>
+            <Textarea label={t("form.description")} rows={7} placeholder="Describe the material, fit, features and anything a customer would want to know before buying." value={values.description ?? ""} onChange={set("description")} hint={t("form.descriptionHint")} />
+            <Textarea label={t("form.descriptionFa")} rows={7} placeholder="توضیح فارسی محصول؛ جنس، اندازه و هر چیزی که مشتری باید بداند." value={values.descriptionFa ?? ""} onChange={set("descriptionFa")} dir="rtl" lang="fa" />
           </FormSection>
 
           <FormSection isMobile={isMobile} id="seo" title={t("form.seo")} description="How this product appears in search results" icon={SearchIcon}>

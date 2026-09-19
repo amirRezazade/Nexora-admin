@@ -164,7 +164,7 @@ export function MobileSidebar() {
   return (
     <div className="fixed inset-0 z-[60] lg:hidden">
       <div className="absolute inset-0 animate-fade-in bg-overlay/45 backdrop-blur-[2px]" onClick={close} aria-hidden />
-      <div role="dialog" aria-modal="true" aria-label="Navigation menu" className="absolute inset-y-0 start-0 w-[272px] animate-slide-in-left border-e border-line shadow-xl">
+      <div role="dialog" aria-modal="true" aria-label="Navigation menu" className={cn("absolute inset-y-0 start-0 w-[272px] border-e border-line shadow-xl", locale === "fa" ? "animate-slide-in-right" : "animate-slide-in-left")}>
         <SidebarContent onNavigate={close} />
       </div>
     </div>

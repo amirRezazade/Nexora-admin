@@ -1,46 +1,44 @@
-'use client';
+"use client";
 
-import { useEffect, useMemo, useState } from 'react';
-import Link from 'next/link';
-import { useDispatch, useSelector } from 'react-redux';
-import {
-  Bell, ShoppingCart, Package, Star, Server, CheckCheck, Circle, CircleDot, Inbox,
-} from 'lucide-react';
-import { cn, relativeTime, dateTime } from '@/lib/format';
-import { fetchNotifications, markAllRead, toggleRead } from '@/store/slices/notificationsSlice';
-import { toast } from '@/store/slices/uiSlice';
-import { useI18n } from '@/i18n/I18nProvider';
+import { useEffect, useMemo, useState } from "react";
+import Link from "next/link";
+import { useDispatch, useSelector } from "react-redux";
+import { Bell, ShoppingCart, Package, Star, Server, CheckCheck, Circle, CircleDot, Inbox } from "lucide-react";
+import { cn, relativeTime, dateTime } from "@/lib/format";
+import { fetchNotifications, markAllRead, toggleRead } from "@/store/slices/notificationsSlice";
+import { toast } from "@/store/slices/uiSlice";
+import { useI18n } from "@/i18n/I18nProvider";
 
-import PageHeader from '@/components/ui/PageHeader';
-import Button from '@/components/ui/Button';
-import IconButton from '@/components/ui/IconButton';
-import Card from '@/components/ui/Card';
-import Tabs from '@/components/ui/Tabs';
-import Badge from '@/components/ui/Badge';
-import { SkeletonList } from '@/components/ui/Skeleton';
-import EmptyState from '@/components/ui/EmptyState';
-import ErrorState from '@/components/ui/ErrorState';
+import PageHeader from "@/components/ui/PageHeader";
+import Button from "@/components/ui/Button";
+import IconButton from "@/components/ui/IconButton";
+import Card from "@/components/ui/Card";
+import Tabs from "@/components/ui/Tabs";
+import Badge from "@/components/ui/Badge";
+import { SkeletonList } from "@/components/ui/Skeleton";
+import EmptyState from "@/components/ui/EmptyState";
+import ErrorState from "@/components/ui/ErrorState";
 
 const CATEGORY_META = {
-  orders: { label: 'Orders', icon: ShoppingCart },
-  inventory: { label: 'Inventory', icon: Package },
-  reviews: { label: 'Reviews', icon: Star },
-  system: { label: 'System', icon: Server },
+  orders: { label: "Orders", icon: ShoppingCart },
+  inventory: { label: "Inventory", icon: Package },
+  reviews: { label: "Reviews", icon: Star },
+  system: { label: "System", icon: Server },
 };
 
 const TONES = {
-  danger: 'bg-danger-soft text-danger-text',
-  warning: 'bg-warning-soft text-warning-text',
-  success: 'bg-success-soft text-success-text',
-  info: 'bg-info-soft text-info-text',
-  neutral: 'bg-surface-3 text-ink-2',
+  danger: "bg-danger-soft text-danger-text",
+  warning: "bg-warning-soft text-warning-text",
+  success: "bg-success-soft text-success-text",
+  info: "bg-info-soft text-info-text",
+  neutral: "bg-surface-3 text-ink-2",
 };
 
 export default function NotificationsPage() {
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
   const dispatch = useDispatch();
-  const { items, counts, unread, status } = useSelector((s) => s.notifications);
-  const [tab, setTab] = useState('all');
+  const { items, counts, unread, status, pendingId, markingAll } = useSelector((s) => s.notifications);
+  const [tab, setTab] = useState("all");
   const [unreadOnly, setUnreadOnly] = useState(false);
 
   useEffect(() => {
@@ -48,13 +46,13 @@ export default function NotificationsPage() {
   }, [dispatch]);
 
   const filtered = useMemo(() => {
-    let out = tab === 'all' ? items : items.filter((n) => n.category === tab);
+    let out = tab === "all" ? items : items.filter((n) => n.category === tab);
     if (unreadOnly) out = out.filter((n) => !n.read);
     return out;
   }, [items, tab, unreadOnly]);
 
   const tabs = [
-    { value: 'all', label: t('common.all'), count: counts?.all },
+    { value: "all", label: t("common.all"), count: counts?.all },
     ...Object.entries(CATEGORY_META).map(([value, meta]) => ({
       value,
       label: t(`nav.${value}`),
@@ -75,35 +73,31 @@ export default function NotificationsPage() {
     return [...map.entries()];
   }, [filtered]);
 
-  const today = new Date('2026-08-21T12:00:00Z').toISOString().slice(0, 10);
-  const yesterday = new Date('2026-08-20T12:00:00Z').toISOString().slice(0, 10);
-  const dayLabel = (key) =>
-    key === today ? t('common.today') : key === yesterday ? t('common.yesterday') : new Date(key).toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' });
+  const today = new Date("2026-08-21T12:00:00Z").toISOString().slice(0, 10);
+  const yesterday = new Date("2026-08-20T12:00:00Z").toISOString().slice(0, 10);
+  const dayLabel = (key) => (key === today ? t("common.today") : key === yesterday ? t("common.yesterday") : new Date(key).toLocaleDateString(locale === "fa" ? "fa-IR" : "en-US", { weekday: "long", month: "short", day: "numeric" }));
 
   return (
     <div className="flex flex-col gap-5">
       <PageHeader
-        title={t('notificationsPage.title')}
-        description={unread > 0 ? t('notificationsPage.descriptionUnread', { n: unread }) : t('notificationsPage.caughtUp')}
+        title={t("notificationsPage.title")}
+        description={unread > 0 ? t("notificationsPage.descriptionUnread", { n: unread }) : t("notificationsPage.caughtUp")}
         actions={
           <>
-            <Button
-              variant="secondary"
-              onClick={() => setUnreadOnly((v) => !v)}
-              icon={unreadOnly ? CircleDot : Circle}
-            >
-              {unreadOnly ? t('notificationsPage.showingUnread') : t('notificationsPage.showUnread')}
+            <Button variant="secondary" onClick={() => setUnreadOnly((v) => !v)} icon={unreadOnly ? CircleDot : Circle}>
+              {unreadOnly ? t("notificationsPage.showingUnread") : t("notificationsPage.showUnread")}
             </Button>
             <Button
               variant="primary"
               icon={CheckCheck}
-              disabled={unread === 0}
+              disabled={unread === 0 || markingAll}
+              loading={markingAll}
               onClick={() => {
                 dispatch(markAllRead());
-                dispatch(toast.success(t('toast.markedRead')));
+                dispatch(toast.success(t("toast.markedRead")));
               }}
             >
-              {t('notificationsPage.markAll')}
+              {t("notificationsPage.markAll")}
             </Button>
           </>
         }
@@ -114,23 +108,19 @@ export default function NotificationsPage() {
           <Tabs tabs={tabs} value={tab} ariaLabel="Filter notifications by category" onChange={setTab} />
         </div>
 
-        {status === 'failed' ? (
-          <ErrorState title={t('notificationsPage.loadError')} description="Please try again." onRetry={() => dispatch(fetchNotifications())} />
-        ) : status === 'loading' && items.length === 0 ? (
+        {status === "failed" ? (
+          <ErrorState title={t("notificationsPage.loadError")} description={t("common.tryAgain")} onRetry={() => dispatch(fetchNotifications())} />
+        ) : status === "loading" && items.length === 0 ? (
           <SkeletonList rows={6} />
         ) : filtered.length === 0 ? (
           <EmptyState
             icon={Inbox}
-            title={unreadOnly ? t('notificationsPage.nothingUnread') : t('notificationsPage.empty')}
-            description={
-              unreadOnly
-                ? 'You’ve read everything in this category.'
-                : 'Store activity, stock alerts and new orders will appear here.'
-            }
+            title={unreadOnly ? t("notificationsPage.nothingUnread") : t("notificationsPage.empty")}
+            description={unreadOnly ? t("notificationsPage.nothingUnreadHint") : t("notificationsPage.emptyHint")}
             action={
               unreadOnly && (
                 <Button variant="secondary" onClick={() => setUnreadOnly(false)}>
-                  Show all notifications
+                  {t("notificationsPage.showAll")}
                 </Button>
               )
             }
@@ -139,28 +129,29 @@ export default function NotificationsPage() {
           <div>
             {groups.map(([day, group]) => (
               <section key={day}>
-                <h2 className="sticky top-14 z-10 border-y border-line bg-surface-2 px-5 py-1.5 text-micro uppercase tracking-wide text-ink-3 sm:px-6">
-                  {dayLabel(day)}
-                </h2>
+                <h2 className="sticky top-14 z-10 border-y border-line bg-surface-2 px-5 py-1.5 text-micro uppercase tracking-wide text-ink-3 sm:px-6">{dayLabel(day)}</h2>
                 <ul>
                   {group.map((n) => {
-                    const meta = CATEGORY_META[n.category] || { icon: Bell, label: 'General' };
+                    const meta = CATEGORY_META[n.category] || { icon: Bell };
                     const Icon = meta.icon;
+                    const catLabel = t(`nav.${n.category}`) !== `nav.${n.category}` ? t(`nav.${n.category}`) : t("nav.notifications");
                     return (
-                      <li key={n.id} className={cn('border-b border-line last:border-0', !n.read && 'bg-brand-softer/50')}>
+                      <li key={n.id} className={cn("border-b border-line last:border-0", !n.read && "bg-brand-softer/50")}>
                         <div className="flex items-start gap-3 px-5 py-4 transition-colors hover:bg-surface-2 sm:px-6">
-                          <span className={cn('mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-control', TONES[n.tone] || TONES.neutral)}>
+                          <span className={cn("mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-control", TONES[n.tone] || TONES.neutral)}>
                             <Icon aria-hidden className="h-4 w-4" />
                           </span>
 
                           <Link href={n.href} className="min-w-0 flex-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand rounded">
                             <span className="flex flex-wrap items-center gap-2">
                               <span className="text-body-sm font-semibold text-ink">{n.title}</span>
-                              <Badge tone="outline" size="sm">{meta.label}</Badge>
+                              <Badge tone="outline" size="sm">
+                                {catLabel}
+                              </Badge>
                               {!n.read && (
                                 <span className="inline-flex items-center gap-1 text-caption font-medium text-brand-text">
                                   <span aria-hidden className="h-1.5 w-1.5 rounded-full bg-brand" />
-                                  {t('notificationsPage.unread')}
+                                  {t("notificationsPage.unread")}
                                 </span>
                               )}
                             </span>
@@ -170,12 +161,7 @@ export default function NotificationsPage() {
                             </span>
                           </Link>
 
-                          <IconButton
-                            icon={n.read ? Circle : CheckCheck}
-                            size="sm"
-                            label={n.read ? `Mark “${n.title}” as unread` : `Mark “${n.title}” as read`}
-                            onClick={() => dispatch(toggleRead(n.id))}
-                          />
+                          <IconButton icon={n.read ? Circle : CheckCheck} size="sm" loading={pendingId === n.id} label={n.read ? t("notificationsPage.markUnread") : t("notificationsPage.markRead")} onClick={() => dispatch(toggleRead(n.id))} />
                         </div>
                       </li>
                     );

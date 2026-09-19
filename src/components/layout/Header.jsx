@@ -67,7 +67,7 @@ function LanguageSwitcher() {
       width="w-40"
       menuLabel={t("header.language")}
       trigger={
-        <button type="button" className="hidden h-8 min-w-[40px] items-center justify-center rounded-control px-2 text-caption font-semibold text-ink-2 transition-colors hover:bg-surface-3 hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand sm:inline-flex" aria-label={t("header.language")}>
+        <button type="button" className="inline-flex h-8 min-w-[40px] items-center justify-center rounded-control px-2 text-caption font-semibold text-ink-2 transition-colors hover:bg-surface-3 hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand" aria-label={t("header.language")}>
           {locale === "fa" ? "فا" : "EN"}
         </button>
       }
@@ -123,7 +123,7 @@ function NotificationPopover() {
       }
     >
       {({ close }) => (
-        <div className="flex min-w-0 flex-col overflow-hidden">
+        <div className="flex min-w-0 flex-col overflow-x-hidden">
           <div className="flex flex-wrap items-center justify-between gap-2 border-b border-line px-4 py-3">
             <div className="flex min-w-0 items-baseline gap-2">
               <h3 className="text-h4 text-ink">{t("nav.notifications")}</h3>
@@ -136,7 +136,7 @@ function NotificationPopover() {
             )}
           </div>
 
-          <div className="max-h-[320px] grow overflow-y-auto">
+          <div className="max-h-[360px] overflow-y-auto">
             {status === "loading" && !items.length ? (
               <SkeletonList rows={4} />
             ) : items.length === 0 ? (
@@ -293,9 +293,9 @@ export default function Header() {
       </div>
 
       {/* Desktop search affordance */}
-      <button type="button" onClick={() => dispatch(setSearchOpen(true))} className="hidden h-8 w-56 items-center gap-2 rounded-control border border-line-strong justify-between bg-surface px-2.5 text-left text-body-sm text-ink-3 transition-colors hover:border-ink-3/40 hover:bg-surface-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-canvas md:flex xl:w-72">
+      <button type="button" onClick={() => dispatch(setSearchOpen(true))} className="hidden h-8 w-56 items-center gap-2 rounded-control border border-line-strong bg-surface px-2.5 text-left text-body-sm text-ink-3 transition-colors hover:border-ink-3/40 hover:bg-surface-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-canvas md:flex xl:w-72">
         <Search aria-hidden className="h-3.5 w-3.5 shrink-0" />
-        <span className="flex-1 truncate max-w-fit me-auto">{t("header.search")}</span>
+        <span className="flex-1 truncate">{t("header.search")}</span>
         <kbd className="shrink-0 rounded border border-line bg-surface-2 px-1 py-px text-[10px] font-semibold text-ink-3">⌘K</kbd>
       </button>
 

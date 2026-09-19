@@ -3,14 +3,14 @@
 import { useState } from "react";
 
 const KEY = "nexora-store-settings";
-const LEGACY_KEY = "nexora-store-settings";
+const LEGACY_KEY = "nova-store-settings";
 
 export const SETTINGS_DEFAULTS = {
   general: {
     storeName: "Nexora Store",
     storeEmail: "hello@nexora.com",
     supportPhone: "+49 69 5550 1200",
-    storefrontUrl: "https://nexora.com",
+    storefrontUrl: "nexora-admin-app.vercel.app/",
     description: "Considered everyday essentials — footwear, apparel, audio and home goods, chosen for how they wear over years rather than seasons.",
     currency: "USD",
     timezone: "Europe/Berlin",
@@ -91,7 +91,10 @@ export function loadSettings() {
   try {
     const raw = window.localStorage.getItem(KEY);
     if (!raw) return structuredClone(SETTINGS_DEFAULTS);
-    return merge(SETTINGS_DEFAULTS, JSON.parse(raw));
+    const merged = merge(SETTINGS_DEFAULTS, JSON.parse(raw));
+    merged.general.storeName = SETTINGS_DEFAULTS.general.storeName;
+    merged.general.storefrontUrl = SETTINGS_DEFAULTS.general.storefrontUrl;
+    return merged;
   } catch {
     return structuredClone(SETTINGS_DEFAULTS);
   }
