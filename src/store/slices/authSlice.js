@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { supabase } from "@/lib/supabaseClient";
 
-const DEMO = { email: "sarah@novastore.com", password: "nova2026" };
+const DEMO = { email: "amir.rezazadeh@nexora.com", password: "nexora2026" };
 
 function mapUser(sessionUser, profile) {
   const name = profile?.name || sessionUser?.user_metadata?.name || sessionUser?.email || "User";

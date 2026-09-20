@@ -10,7 +10,7 @@ export const SETTINGS_DEFAULTS = {
     storeName: "Nexora Store",
     storeEmail: "hello@nexora.com",
     supportPhone: "+49 69 5550 1200",
-    storefrontUrl: "nexora-admin-app.vercel.app/",
+    storefrontUrl: "https://nexora-admin-app.vercel.app/",
     description: "Considered everyday essentials — footwear, apparel, audio and home goods, chosen for how they wear over years rather than seasons.",
     currency: "USD",
     timezone: "Europe/Berlin",
@@ -53,7 +53,7 @@ export const SETTINGS_DEFAULTS = {
     freeThreshold: "75",
   },
   notifications: {
-    email: "sarah@novastore.com",
+    email: "amir.rezazadeh@nexora.com",
     digest: "realtime",
     order_new: true,
     order_cancelled: true,

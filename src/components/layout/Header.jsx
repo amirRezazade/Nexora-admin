@@ -237,7 +237,7 @@ function UserMenu() {
       menuLabel={t("header.account")}
       trigger={
         <button type="button" className="flex items-center gap-1.5 rounded-pill p-0.5 pr-1.5 transition-colors hover:bg-surface-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-canvas" aria-label={t("header.accountMenu", { name: user?.name || "" })}>
-          <Avatar name={user?.name || "Sarah Chen"} tone="brand" size="md" />
+          <Avatar name={user?.name || "Amir Rezazadeh"} tone="brand" size="md" />
           <ChevronDown aria-hidden className="hidden h-3.5 w-3.5 text-ink-3 sm:block" />
         </button>
       }

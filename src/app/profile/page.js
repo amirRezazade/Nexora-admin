@@ -14,7 +14,7 @@ import PageHeader from "@/components/ui/PageHeader";
 
 /**
  * Demo lock — this project is a portfolio piece with one shared demo account
- * (sarah@novastore.com / nova2026). Visitors must not be able to change its
+ * (amir.rezazadeh@nexora.com / nexora2026). Visitors must not be able to change its
  * email or password, or nobody could sign in afterwards. Name changes stay
  * real (harmless). Flip to false to enable real email/password changes.
  */

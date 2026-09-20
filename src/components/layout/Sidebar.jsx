@@ -70,7 +70,7 @@ function NavLink({ item, collapsed, unread, onNavigate }) {
       href={item.href}
       onClick={onNavigate}
       aria-current={active ? "page" : undefined}
-      className={cn("group relative flex items-center gap-2.5 rounded-control py-2 text-body-sm font-medium transition-colors duration-150", "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-surface", collapsed ? "justify-center px-2" : "px-2.5", active ? "bg-brand-soft text-brand-text" : "text-ink-2 hover:bg-surface-3 hover:text-ink")}
+      className={cn("group relative flex items-center gap-2.5 rounded-control py-2 text-body-sm font-medium transition-colors duration-150", "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-surface", collapsed ? "justify-center px-0" : "px-2.5", active ? "bg-brand-soft text-brand-text" : "text-ink-2 hover:bg-surface-3 hover:text-ink")}
     >
       {/* Active rail — reinforces selection beyond the tint alone */}
       {active && <span aria-hidden className={cn("absolute rounded-pill bg-brand", collapsed ? "-start-2 top-1/2 h-5 w-1 -translate-y-1/2" : "-start-3 top-1/2 h-5 w-[3px] -translate-y-1/2")} />}
@@ -129,6 +129,17 @@ export function SidebarContent({ collapsed = false, onNavigate }) {
           </li>
         </ul>
 
+        <Link href="/profile" onClick={onNavigate} className={cn("mt-2 flex items-center gap-2.5 rounded-control py-2 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand", collapsed ? "justify-center px-0" : "px-2", isActive(pathname, "/profile") ? "bg-brand-soft" : "hover:bg-surface-3")}>
+          <Avatar name={user?.name || "Amir Rezazadeh"} tone="brand" size={collapsed ? "sm" : "md"} />
+          {!collapsed && (
+            <span className="min-w-0 flex-1">
+              <span className="block truncate text-body-sm font-medium text-ink">{user?.name}</span>
+              <span className="block truncate text-caption text-ink-3">{user?.role}</span>
+            </span>
+          )}
+          {!collapsed && <ChevronRight aria-hidden className="h-4 w-4 shrink-0 text-ink-3" />}
+        </Link>
+
         {/* Collapse control — desktop only */}
         <button type="button" onClick={() => dispatch(toggleSidebar())} className={cn("mt-2 hidden w-full items-center gap-2.5 rounded-control py-2 text-body-sm font-medium text-ink-3 transition-colors hover:bg-surface-3 hover:text-ink lg:flex", "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand", collapsed ? "justify-center px-0" : "px-2.5")} aria-label={collapsed ? t("nav.expand") : t("nav.collapse")}>
           {collapsed ? (
@@ -155,7 +166,7 @@ export default function Sidebar() {
 }
 
 export function MobileSidebar() {
-  const { locale } = useI18n();
+  const { locale, t } = useI18n();
   const dispatch = useDispatch();
   const open = useSelector((s) => s.ui.mobileNavOpen);
   const close = () => dispatch(setMobileNav(false));
@@ -164,7 +175,7 @@ export function MobileSidebar() {
   return (
     <div className="fixed inset-0 z-[60] lg:hidden">
       <div className="absolute inset-0 animate-fade-in bg-overlay/45 backdrop-blur-[2px]" onClick={close} aria-hidden />
-      <div role="dialog" aria-modal="true" aria-label="Navigation menu" className={cn("absolute inset-y-0 start-0 w-[272px] border-e border-line shadow-xl", locale === "fa" ? "animate-slide-in-right" : "animate-slide-in-left")}>
+      <div role="dialog" aria-modal="true" aria-label={t("header.openNav")} className={cn("absolute inset-y-0 start-0 w-[272px] border-e border-line shadow-xl", locale === "fa" ? "animate-slide-in-right" : "animate-slide-in-left")}>
         <SidebarContent onNavigate={close} />
       </div>
     </div>

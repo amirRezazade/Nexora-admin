@@ -187,7 +187,9 @@
   }
 
   ::selection {
-    background: rgb(var(--c-brand) / 0.22);
+    background: rgb(var(--c-brand) / 0.82);
+    color: white;
+    opacity: 100;
   }
 
   /* Scrollbars */
