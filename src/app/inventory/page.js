@@ -257,7 +257,7 @@ export default function InventoryPage() {
               <caption className="sr-only">Inventory levels. Available quantities can be edited inline.</caption>
               <THead>
                 <tr>
-                  <TH sortable sortKey="name" currentSort={sort} onSort={(k) => dispatch(setSort(k))} className={cn(stickyLeft, "bg-surface-2 min-w-[240px]")}>
+                  <TH sortable sortKey="name" currentSort={sort} onSort={(k) => dispatch(setSort(k))} className={cn("bg-surface-2 min-w-50")}>
                     {t("inventoryPage.colProduct")}
                   </TH>
                   <TH>{t("inventoryPage.colSku")}</TH>
@@ -282,7 +282,7 @@ export default function InventoryPage() {
               <TBody>
                 {items.map((row) => (
                   <TR key={row.id}>
-                    <TD className={stickyLeft}>
+                    <TD>
                       <div className="flex items-center gap-3">
                         <ProductThumb name={localized(row, "name", locale)} seed={row.id} src={row.image || row.primaryImage} size="sm" />
                         <div className="min-w-0">

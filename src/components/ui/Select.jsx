@@ -12,7 +12,7 @@ const Select = forwardRef(function Select({ label, hint, error, required, option
   return (
     <FieldShell label={label} htmlFor={fieldId} required={required} hint={hint} error={error}>
       <div className="relative">
-        <select ref={ref} id={fieldId} aria-invalid={error ? "true" : undefined} className={cn(fieldBase, "cursor-pointer appearance-none pr-9", size === "sm" ? "h-8 pl-2.5 text-body-sm" : "h-9 pl-3 text-body", error ? "border-danger focus:border-danger focus:ring-danger/20" : "border-line-strong", className)} {...props}>
+        <select ref={ref} id={fieldId} aria-invalid={error ? "true" : undefined} className={cn(fieldBase, "cursor-pointer appearance-none pe-9", size === "sm" ? "h-8 ps-2.5 text-body-sm" : "h-9 ps-3 text-body", error ? "border-danger focus:border-danger focus:ring-danger/20" : "border-line-strong", className)} {...props}>
           {placeholder && <option value="">{placeholder}</option>}
           {options.map((o) => (
             <option key={o.value} value={o.value} disabled={o.disabled}>

@@ -216,7 +216,7 @@ export default function CategoriesPage() {
             onChange={(e) => dispatch(setFilter({ key: "status", value: e.target.value ? [e.target.value] : [] }))}
             className="w-36"
           />
-          <Button size="sm" variant="primary" icon={Plus} className="ml-auto hidden lg:inline-flex" onClick={() => setDialog({ open: true, category: null })}>
+          <Button size="sm" variant="primary" icon={Plus} className="ml-auto hidden! sm:inline-flex!" onClick={() => setDialog({ open: true, category: null })}>
             {t("form.addCategory")}
           </Button>
         </div>
@@ -242,14 +242,14 @@ export default function CategoriesPage() {
               <caption className="sr-only">{t("categoriesPage.description")}</caption>
               <THead>
                 <tr>
-                  <TH sortable sortKey="name" currentSort={sort} onSort={(k) => dispatch(setSort(k))} className="min-w-[260px]">
+                  <TH sortable sortKey="name" currentSort={sort} onSort={(k) => dispatch(setSort(k))} className="sm:min-w-[260px]">
                     {t("categoriesPage.colCategory")}
                   </TH>
                   <TH className="hidden md:table-cell">{t("categoriesPage.colSlug")}</TH>
                   <TH align="right" sortable sortKey="productCount" currentSort={sort} onSort={(k) => dispatch(setSort(k))}>
                     {t("categoriesPage.colProducts")}
                   </TH>
-                  <TH>{t("categoriesPage.colStatus")}</TH>
+                  <TH className="hidden sm:table-cell">{t("categoriesPage.colStatus")}</TH>
                   <TH width="60px" align="right">
                     <span className="sr-only">{t("common.actions")}</span>
                   </TH>
@@ -270,7 +270,7 @@ export default function CategoriesPage() {
                               </Badge>
                             )}
                           </div>
-                          {c.parentId ? <p className="text-caption text-ink-3">{t("categoriesPage.inParent", { name: parentName(c.parentId) })}</p> : c.description ? <p className="truncate text-caption text-ink-3">{c.description}</p> : null}
+                          {c.parentId ? <p className="text-caption text-ink-3">{t("categoriesPage.inParent", { name: parentName(c.parentId) })}</p> : c.description ? <p className="hidden truncate text-caption text-ink-3 sm:block">{c.description}</p> : null}
                         </div>
                       </div>
                     </TD>
@@ -283,7 +283,7 @@ export default function CategoriesPage() {
                       </Link>
                       {c.childCount > 0 && c.descendantCount !== c.productCount && <span className="block text-caption text-ink-3">{t("categoriesPage.withSubs", { n: number(c.descendantCount) })}</span>}
                     </TD>
-                    <TD>
+                    <TD className="hidden sm:table-cell">
                       <Badge tone={STATUS_TONES[c.status] || "neutral"} dot size="sm">
                         {t(`status.${c.status}`)}
                       </Badge>
