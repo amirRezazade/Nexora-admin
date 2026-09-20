@@ -275,7 +275,7 @@ export default function CouponsPage() {
 
       <Card className="flex flex-col">
         <div className="flex flex-wrap items-center gap-2 border-b border-line px-4 py-3 sm:px-5">
-          <div className="relative min-w-0 flex-1 sm:max-w-xs">
+          <div className="relative min-w-0 flex-1 sm:max-w-xs min-w-35">
             <Input
               type="search"
               icon={Search}
@@ -352,12 +352,14 @@ export default function CouponsPage() {
               <caption className="sr-only">Discount coupons with their usage and expiry.</caption>
               <THead>
                 <tr>
-                  <TH className="min-w-[180px]">{t("couponsPage.colCode")}</TH>
-                  <TH>{t("couponsPage.colType")}</TH>
+                  <TH className="sm:min-w-[180px]">{t("couponsPage.colCode")}</TH>
+                  <TH className="hidden sm:table-cell">{t("couponsPage.colType")}</TH>
                   <TH align="right">{t("couponsPage.colDiscount")}</TH>
-                  <TH align="right">{t("couponsPage.colUsage")}</TH>
+                  <TH align="right" className="hidden sm:table-cell">
+                    {t("couponsPage.colUsage")}
+                  </TH>
                   <TH className="hidden md:table-cell">{t("couponsPage.colExpiration")}</TH>
-                  <TH>{t("couponsPage.colStatus")}</TH>
+                  <TH className="hidden sm:table-cell">{t("couponsPage.colStatus")}</TH>
                   <TH width="60px" align="right">
                     <span className="sr-only">Actions</span>
                   </TH>
@@ -389,16 +391,18 @@ export default function CouponsPage() {
                               {c.code}
                               <Copy aria-hidden className="h-3 w-3 opacity-0 transition-opacity group-hover/copy:opacity-60" />
                             </button>
-                            {c.description && <p className="truncate text-caption text-ink-3">{c.description}</p>}
+                            {c.description && <p className="hidden truncate text-caption text-ink-3 sm:block">{c.description}</p>}
                           </div>
                         </div>
                       </TD>
-                      <TD muted>{t(`couponsPage.${c.type === "free_shipping" ? "freeShipping" : c.type}`)}</TD>
+                      <TD className="hidden sm:table-cell" muted>
+                        {t(`couponsPage.${c.type === "free_shipping" ? "freeShipping" : c.type}`)}
+                      </TD>
                       <TD align="right" numeric strong>
                         {c.type === "percentage" ? `${c.value}%` : c.type === "fixed" ? currency(c.value) : "Free ship"}
                         {c.minOrder > 0 && <span className="block text-caption font-normal text-ink-3">min {currency(c.minOrder, { decimals: 0 })}</span>}
                       </TD>
-                      <TD align="right">
+                      <TD align="right" className="hidden sm:table-cell">
                         <div className="flex flex-col items-end gap-1">
                           <span className="text-body-sm font-medium tabular-nums text-ink">
                             {number(c.usage)}
@@ -414,7 +418,7 @@ export default function CouponsPage() {
                       <TD numeric muted className="hidden md:table-cell">
                         <span className={expired ? "text-ink-3 line-through" : ""}>{dateShort(c.expiresAt)}</span>
                       </TD>
-                      <TD>
+                      <TD className="hidden sm:table-cell">
                         <StatusBadge map={COUPON_STATUS} value={c.status} size="sm" />
                       </TD>
                       <TD align="right">
@@ -447,7 +451,7 @@ export default function CouponsPage() {
                                   toggleStatus(c);
                                 }}
                               >
-                                {c.status === "disabled" ? t("common.enable") : t("common.disable")}
+                                {c.status === "disabled" ? "Enable" : "Disable"}
                               </MenuItem>
                               <MenuSeparator />
                               <MenuItem

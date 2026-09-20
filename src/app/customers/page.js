@@ -138,7 +138,7 @@ export default function CustomersPage() {
         </div>
 
         {status === "failed" ? (
-          <ErrorState title={t("customersPage.loadError")} description="Please try again." onRetry={() => dispatch(fetchCustomers())} />
+          <ErrorState title={t("customersPage.loadError")} description={t("common.tryAgain")} onRetry={() => dispatch(fetchCustomers())} />
         ) : loading && items.length === 0 ? (
           <SkeletonTable rows={8} columns={6} checkbox={false} />
         ) : items.length === 0 ? (

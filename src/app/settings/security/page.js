@@ -4,6 +4,8 @@ import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { Monitor, Smartphone, Tablet, LogOut } from "lucide-react";
 import { relativeTime } from "@/lib/format";
+import { supabase } from "@/lib/supabaseClient";
+import { signOut } from "@/store/slices/authSlice";
 import { toast } from "@/store/slices/uiSlice";
 import { useI18n } from "@/i18n/I18nProvider";
 import SettingsLayout from "@/components/layout/SettingsLayout";
@@ -57,6 +59,12 @@ export function SessionList({ sessions, onRevoke }) {
   );
 }
 
+/**
+ * Demo lock — shared portfolio account: block real password changes so
+ * visitors can't break the demo login. Flip to false to enable.
+ */
+const ACCOUNT_EDIT_LOCKED = true;
+
 export default function SecuritySettingsPage() {
   const { t } = useI18n();
   const dispatch = useDispatch();
@@ -78,11 +86,23 @@ export default function SecuritySettingsPage() {
     setErrors(errs);
     if (Object.keys(errs).length) return;
 
+    if (ACCOUNT_EDIT_LOCKED) {
+      dispatch(toast.warning(t("toast.accountLocked")));
+      setValues({ current: "", next: "", confirm: "" });
+      return;
+    }
+
     setSaving(true);
-    await new Promise((r) => setTimeout(r, 800));
-    setSaving(false);
-    setValues({ current: "", next: "", confirm: "" });
-    dispatch(toast.success(t("toast.passwordUpdated"), t("toast.passwordUpdatedHint")));
+    try {
+      const { error } = await supabase.auth.updateUser({ password: values.next });
+      if (error) throw error;
+      setValues({ current: "", next: "", confirm: "" });
+      dispatch(toast.success(t("toast.passwordUpdated"), t("toast.passwordUpdatedHint")));
+    } catch (err) {
+      dispatch(toast.error(t("toast.passwordUpdateError"), err?.message || t("common.tryAgain")));
+    } finally {
+      setSaving(false);
+    }
   };
 
   const revoke = (s) => {
@@ -177,9 +197,9 @@ export default function SecuritySettingsPage() {
         open={confirmRevokeAll}
         onClose={() => setConfirmRevokeAll(false)}
         onConfirm={() => {
-          setSessions((list) => list.filter((s) => s.current));
           setConfirmRevokeAll(false);
           dispatch(toast.success(t("toast.signedOutAll"), t("toast.signedOutAllHint")));
+          dispatch(signOut("global"));
         }}
         title={t("confirm.signOutAll")}
         message={t("confirm.signOutAllMsg")}

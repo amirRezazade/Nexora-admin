@@ -193,12 +193,12 @@ export default function ReviewsPage() {
               <caption className="sr-only">Customer reviews awaiting or completed moderation.</caption>
               <THead>
                 <tr>
-                  <TH width="120px">{t("reviewsPage.colRating")}</TH>
-                  <TH className="min-w-[160px]">{t("reviewsPage.colCustomer")}</TH>
+                  <TH className="w-[84px] sm:w-[120px]">{t("reviewsPage.colRating")}</TH>
+                  <TH className="hidden sm:table-cell sm:min-w-[160px]">{t("reviewsPage.colCustomer")}</TH>
                   <TH className="hidden md:table-cell">{t("reviewsPage.colProduct")}</TH>
-                  <TH className="min-w-[260px]">{t("reviewsPage.colReview")}</TH>
-                  <TH className="hidden lg:table-cell">{t("reviewsPage.colDate")}</TH>
-                  <TH>{t("reviewsPage.colStatus")}</TH>
+                  <TH className="sm:min-w-[260px]">{t("reviewsPage.colReview")}</TH>
+                  <TH className="hidden xl:table-cell">{t("reviewsPage.colDate")}</TH>
+                  <TH className="hidden lg:table-cell">{t("reviewsPage.colStatus")}</TH>
                   <TH width="60px" align="right">
                     <span className="sr-only">Actions</span>
                   </TH>
@@ -210,7 +210,7 @@ export default function ReviewsPage() {
                     <TD>
                       <Rating value={r.rating} showValue={false} />
                     </TD>
-                    <TD>
+                    <TD className="hidden sm:table-cell">
                       <div className="flex items-center gap-2.5">
                         <Avatar name={r.customerName} size="sm" tone="neutral" />
                         <div className="min-w-0">
@@ -234,16 +234,16 @@ export default function ReviewsPage() {
                       <p className="text-body-sm font-medium text-ink">{r.title}</p>
                       <p className="line-clamp-2 max-w-md text-caption leading-relaxed text-ink-2">{r.body}</p>
                     </TD>
-                    <TD numeric muted className="hidden lg:table-cell">
+                    <TD numeric muted className="hidden xl:table-cell">
                       {dateShort(r.createdAt)}
                       <span className="block text-caption text-ink-3">{relativeTime(r.createdAt)}</span>
                     </TD>
-                    <TD>
+                    <TD className="hidden lg:table-cell">
                       <StatusBadge map={REVIEW_STATUS} value={r.status} size="sm" />
                     </TD>
                     <TD align="right">
                       <div className="flex items-center justify-end gap-1">
-                        {r.status === "pending" && <IconButton icon={Check} size="sm" label={`Publish review from ${r.customerName}`} className="text-success-text hover:bg-success-soft" onClick={() => moderate(r, "published")} />}
+                        {r.status === "pending" && <IconButton icon={Check} size="sm" label={`Publish review from ${r.customerName}`} className="hidden text-success-text hover:bg-success-soft sm:inline-flex" onClick={() => moderate(r, "published")} />}
                         <Dropdown menuLabel={`Actions for review from ${r.customerName}`} trigger={<IconButton icon={MoreHorizontal} size="sm" label={`Actions for review from ${r.customerName}`} />}>
                           {({ close }) => (
                             <>

@@ -7,7 +7,7 @@ const FA_DIGITS = "۰۱۲۳۴۵۶۷۸۹";
 function readStoredLocale() {
   if (typeof window === "undefined") return "en";
   try {
-    const l = window.localStorage.getItem("nexora-locale") || window.localStorage.getItem("nexora-locale");
+    const l = window.localStorage.getItem("nexora-locale") || window.localStorage.getItem("nova-locale");
     return l === "fa" ? "fa" : "en";
   } catch {
     return "en";
@@ -88,10 +88,8 @@ export const dateTime = (d) =>
 
 export const timeOnly = (d) => new Date(d).toLocaleTimeString(intlLocale(), { hour: "numeric", minute: "2-digit" });
 
-const NOW = new Date("2026-08-21T12:00:00Z");
-
 export function relativeTime(d) {
-  const diff = NOW.getTime() - new Date(d).getTime();
+  const diff = Date.now() - new Date(d).getTime();
   const mins = Math.round(diff / 60000);
   const fa = formatLocale === "fa";
   if (mins < 1) return fa ? "همین حالا" : "Just now";

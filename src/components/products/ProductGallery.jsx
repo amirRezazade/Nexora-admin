@@ -8,6 +8,7 @@ import "swiper/css";
 import "swiper/css/pagination";
 import "swiper/css/thumbs";
 import { cn, productArt } from "@/lib/format";
+import { supabase } from "@/lib/supabaseClient";
 import { useI18n } from "@/i18n/I18nProvider";
 import IconButton from "@/components/ui/IconButton";
 import Button from "@/components/ui/Button";
@@ -34,13 +35,38 @@ function initialsOf(name) {
     .toUpperCase();
 }
 
-function readImageFile(file) {
-  return new Promise((resolve, reject) => {
+/** Public bucket in Supabase Storage. Falls back to data URLs when missing. */
+const IMAGE_BUCKET = "product-images";
+
+function uploadToStorage(blob) {
+  const ext = (blob.type && blob.type.split("/")[1]) || "jpg";
+  const path = `${new Date().getUTCFullYear()}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+  return supabase.storage
+    .from(IMAGE_BUCKET)
+    .upload(path, blob, { contentType: blob.type || "image/jpeg", cacheControl: "31536000", upsert: false })
+    .then(({ error }) => {
+      if (error) return null;
+      const { data } = supabase.storage.from(IMAGE_BUCKET).getPublicUrl(path);
+      return data?.publicUrl || null;
+    })
+    .catch(() => null);
+}
+
+function blobToDataUrl(blob) {
+  return new Promise((resolve) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.readAsDataURL(blob);
+  });
+}
+
+async function readImageFile(file) {
+  const blob = await new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onerror = () => reject(new Error("Could not read file"));
     reader.onload = () => {
       const img = new Image();
-      img.onerror = () => resolve(reader.result);
+      img.onerror = () => resolve(file);
       img.onload = () => {
         const max = 1400;
         let { width, height } = img;
@@ -54,12 +80,15 @@ function readImageFile(file) {
         canvas.height = height;
         const ctx = canvas.getContext("2d");
         ctx.drawImage(img, 0, 0, width, height);
-        resolve(canvas.toDataURL("image/jpeg", 0.86));
+        canvas.toBlob((b) => resolve(b || file), "image/jpeg", 0.86);
       };
       img.src = reader.result;
     };
     reader.readAsDataURL(file);
   });
+  const remote = await uploadToStorage(blob);
+  if (remote) return remote;
+  return blobToDataUrl(blob);
 }
 
 function Art({ seed, url, className, label, name }) {

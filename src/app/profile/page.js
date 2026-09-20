@@ -5,11 +5,20 @@ import Link from "next/link";
 import { useDispatch, useSelector } from "react-redux";
 import { Camera, Mail, ShieldCheck, LogOut, Upload, Calendar, Award } from "lucide-react";
 import { dateShort, relativeTime } from "@/lib/format";
+import { supabase } from "@/lib/supabaseClient";
 import { updateProfile } from "@/store/slices/authSlice";
 import { toast } from "@/store/slices/uiSlice";
 import { useI18n } from "@/i18n/I18nProvider";
 
 import PageHeader from "@/components/ui/PageHeader";
+
+/**
+ * Demo lock — this project is a portfolio piece with one shared demo account
+ * (sarah@novastore.com / nova2026). Visitors must not be able to change its
+ * email or password, or nobody could sign in afterwards. Name changes stay
+ * real (harmless). Flip to false to enable real email/password changes.
+ */
+const ACCOUNT_EDIT_LOCKED = true;
 import Card, { CardHeader, CardBody } from "@/components/ui/Card";
 import Input from "@/components/ui/Input";
 import Textarea from "@/components/ui/Textarea";
@@ -55,12 +64,30 @@ export default function ProfilePage() {
     setErrors(errs);
     if (Object.keys(errs).length) return;
 
+    if (ACCOUNT_EDIT_LOCKED && values.email.trim() !== (user?.email || "")) {
+      dispatch(toast.warning(t("toast.accountLocked")));
+      return;
+    }
+
     setSaving(true);
-    await new Promise((r) => setTimeout(r, 700));
-    dispatch(updateProfile({ name: values.name, email: values.email }));
-    dispatch(toast.success(t("toast.profileUpdated"), t("toast.profileUpdatedHint")));
-    setSaving(false);
-    setDirty(false);
+    try {
+      const updates = {};
+      const nextName = values.name.trim();
+      const nextEmail = values.email.trim();
+      if (nextName !== (user?.name || "")) updates.data = { name: nextName, full_name: nextName };
+      if (nextEmail !== (user?.email || "")) updates.email = nextEmail;
+      if (Object.keys(updates).length) {
+        const { error } = await supabase.auth.updateUser(updates);
+        if (error) throw error;
+      }
+      dispatch(updateProfile({ name: nextName, email: nextEmail }));
+      dispatch(toast.success(t("toast.profileUpdated"), t("toast.profileUpdatedHint")));
+      setDirty(false);
+    } catch (err) {
+      dispatch(toast.error(t("toast.profileSaveError"), err?.message || t("common.tryAgain")));
+    } finally {
+      setSaving(false);
+    }
   };
 
   const savePassword = async (e) => {
@@ -73,11 +100,23 @@ export default function ProfilePage() {
     setPwErrors(errs);
     if (Object.keys(errs).length) return;
 
+    if (ACCOUNT_EDIT_LOCKED) {
+      dispatch(toast.warning(t("toast.accountLocked")));
+      setPw({ current: "", next: "", confirm: "" });
+      return;
+    }
+
     setPwSaving(true);
-    await new Promise((r) => setTimeout(r, 800));
-    setPwSaving(false);
-    setPw({ current: "", next: "", confirm: "" });
-    dispatch(toast.success(t("toast.passwordUpdated"), t("toast.passwordUpdatedHint")));
+    try {
+      const { error } = await supabase.auth.updateUser({ password: pw.next });
+      if (error) throw error;
+      setPw({ current: "", next: "", confirm: "" });
+      dispatch(toast.success(t("toast.passwordUpdated"), t("toast.passwordUpdatedHint")));
+    } catch (err) {
+      dispatch(toast.error(t("toast.passwordUpdateError"), err?.message || t("common.tryAgain")));
+    } finally {
+      setPwSaving(false);
+    }
   };
 
   return (

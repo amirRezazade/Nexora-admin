@@ -199,7 +199,7 @@ function ThemeToggle() {
   const Icon = preference === "system" ? Monitor : resolved === "dark" ? Moon : Sun;
 
   return (
-    <Dropdown width="w-44" menuLabel="Theme" trigger={<IconButton icon={Icon} label={`${t("header.theme")}: ${preference}`} />}>
+    <Dropdown width="w-44" menuLabel={t("header.theme")} trigger={<IconButton icon={Icon} label={`${t("header.theme")}: ${preference}`} />}>
       {({ close }) => (
         <>
           <MenuLabel>{t("header.appearance")}</MenuLabel>
@@ -234,9 +234,9 @@ function UserMenu() {
   return (
     <Dropdown
       width="w-60"
-      menuLabel="Account"
+      menuLabel={t("header.account")}
       trigger={
-        <button type="button" className="flex items-center gap-1.5 rounded-pill p-0.5 pr-1.5 transition-colors hover:bg-surface-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-canvas" aria-label={`Account menu for ${user?.name}`}>
+        <button type="button" className="flex items-center gap-1.5 rounded-pill p-0.5 pr-1.5 transition-colors hover:bg-surface-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-canvas" aria-label={t("header.accountMenu", { name: user?.name || "" })}>
           <Avatar name={user?.name || "Sarah Chen"} tone="brand" size="md" />
           <ChevronDown aria-hidden className="hidden h-3.5 w-3.5 text-ink-3 sm:block" />
         </button>
@@ -284,18 +284,18 @@ export default function Header() {
   const crumbs = useBreadcrumbs(pageTitle);
 
   return (
-    <header className="sticky top-0 z-30 flex h-14 shrink-0 items-center gap-2 border-b border-line bg-canvas/85 px-4 backdrop-blur-md sm:px-5 lg:px-6">
+    <header className="sticky top-0 z-30 flex h-14 shrink-0 items-center gap-1.5 border-b border-line bg-canvas/85 px-3 backdrop-blur-md sm:gap-2 sm:px-5 lg:px-6">
       <IconButton icon={Menu} label={t("header.openNav")} className="lg:hidden" onClick={() => dispatch(setMobileNav(true))} />
 
       <div className="min-w-0 flex-1">
         <Breadcrumb items={crumbs} className="hidden sm:block" />
-        <span className="text-h4 text-ink sm:hidden">{crumbs[crumbs.length - 1]?.label}</span>
+        <span className="block truncate text-h4 text-ink sm:hidden">{crumbs[crumbs.length - 1]?.label}</span>
       </div>
 
       {/* Desktop search affordance */}
       <button type="button" onClick={() => dispatch(setSearchOpen(true))} className="hidden h-8 w-56 items-center gap-2 rounded-control border border-line-strong bg-surface px-2.5 text-left text-body-sm text-ink-3 transition-colors hover:border-ink-3/40 hover:bg-surface-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-canvas md:flex xl:w-72">
         <Search aria-hidden className="h-3.5 w-3.5 shrink-0" />
-        <span className="flex-1 truncate">{t("header.search")}</span>
+        <span className="flex-1 truncate max-w-fit me-auto">{t("header.search")}</span>
         <kbd className="shrink-0 rounded border border-line bg-surface-2 px-1 py-px text-[10px] font-semibold text-ink-3">⌘K</kbd>
       </button>
 
