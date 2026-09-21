@@ -1,56 +1,47 @@
-"use client";
+'use client';
 
-import { useEffect, useMemo, useRef, useState } from "react";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useDispatch, useSelector } from "react-redux";
-import { Package, Image as ImageIcon, DollarSign, Boxes, Layers, FileText, Search as SearchIcon, Plus, Trash2, AlertCircle, ArrowLeft } from "lucide-react";
-import { api } from "@/lib/api";
-import { cn, currency, slugify, localized } from "@/lib/format";
-import { useMediaQuery } from "@/lib/hooks";
-import { useI18n } from "@/i18n/I18nProvider";
-import { toast } from "@/store/slices/uiSlice";
-import { fetchCategories } from "@/store/slices/categoriesSlice";
+import { useEffect, useMemo, useRef, useState } from 'react';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useDispatch, useSelector } from 'react-redux';
+import {
+  Package, Image as ImageIcon, DollarSign, Boxes, Layers, FileText, Search as SearchIcon,
+  Plus, Trash2, AlertCircle, ArrowLeft,
+} from 'lucide-react';
+import { api } from '@/lib/api';
+import { cn, currency, slugify, localized } from '@/lib/format';
+import { useMediaQuery } from '@/lib/hooks';
+import { useI18n } from '@/i18n/I18nProvider';
+import { toast } from '@/store/slices/uiSlice';
+import { fetchCategories } from '@/store/slices/categoriesSlice';
 
-import Button from "@/components/ui/Button";
-import IconButton from "@/components/ui/IconButton";
-import Card, { CardHeader, CardBody } from "@/components/ui/Card";
-import Input from "@/components/ui/Input";
-import { numberFocusGuards } from "@/lib/numberInput";
-import Textarea from "@/components/ui/Textarea";
-import Select from "@/components/ui/Select";
-import Alert from "@/components/ui/Alert";
-import Badge from "@/components/ui/Badge";
-import Accordion from "@/components/ui/Accordion";
-import ProductGallery from "@/components/products/ProductGallery";
+import Button from '@/components/ui/Button';
+import IconButton from '@/components/ui/IconButton';
+import Card, { CardHeader, CardBody } from '@/components/ui/Card';
+import Input from '@/components/ui/Input';
+import { numberFocusGuards } from '@/lib/numberInput';
+import Textarea from '@/components/ui/Textarea';
+import Select from '@/components/ui/Select';
+import Alert from '@/components/ui/Alert';
+import Badge from '@/components/ui/Badge';
+import Accordion from '@/components/ui/Accordion';
+import ProductGallery from '@/components/products/ProductGallery';
 
-const BRANDS = ["Nexora Basics", "Nike", "Aurex", "Aldgate", "Keystone", "Terra Studio", "Ridgeline"];
-const SUPPLIERS = ["Loomcraft Textiles", "Aurex Audio", "Aldgate Leather Co.", "Keystone Peripherals", "Terra Ceramics", "Ridgeline Outdoor", "Northwind Athletics"];
+const BRANDS = ['Nexora Basics', 'Nike', 'Aurex', 'Aldgate', 'Keystone', 'Terra Studio', 'Ridgeline'];
+const SUPPLIERS = ['Loomcraft Textiles', 'Aurex Audio', 'Aldgate Leather Co.', 'Keystone Peripherals', 'Terra Ceramics', 'Ridgeline Outdoor', 'Northwind Athletics'];
 
 const EMPTY = {
-  name: "",
-  nameFa: "",
-  sku: "",
-  categoryId: "",
-  brand: "Nexora Basics",
-  supplier: "Loomcraft Textiles",
-  status: "draft",
-  price: "",
-  compareAt: "",
-  cost: "",
-  stock: "",
-  threshold: "10",
-  description: "",
-  descriptionFa: "",
-  seoTitle: "",
-  metaDescription: "",
-  slug: "",
-  variants: [],
-  tags: [],
-  images: [],
+  name: '', nameFa: '', sku: '', categoryId: '', brand: 'Nexora Basics', supplier: 'Loomcraft Textiles',
+  status: 'draft', price: '', compareAt: '', cost: '', stock: '', threshold: '10',
+  description: '', descriptionFa: '', seoTitle: '', metaDescription: '', slug: '',
+  variants: [], tags: [], images: [],
 };
 
-const TEXT_KEYS = ["name", "nameFa", "sku", "categoryId", "brand", "supplier", "status", "price", "compareAt", "cost", "stock", "threshold", "description", "descriptionFa", "seoTitle", "metaDescription", "slug"];
+const TEXT_KEYS = [
+  'name', 'nameFa', 'sku', 'categoryId', 'brand', 'supplier', 'status',
+  'price', 'compareAt', 'cost', 'stock', 'threshold',
+  'description', 'descriptionFa', 'seoTitle', 'metaDescription', 'slug',
+];
 
 function normalizeProduct(initial) {
   const merged = { ...EMPTY, ...(initial || {}) };
@@ -60,10 +51,10 @@ function normalizeProduct(initial) {
   merged.variants = Array.isArray(merged.variants)
     ? merged.variants.map((v) => ({
         ...v,
-        size: v.size ?? "",
-        color: v.color ?? "",
-        sku: v.sku ?? "",
-        price: v.price == null ? "" : v.price,
+        size: v.size ?? '',
+        color: v.color ?? '',
+        sku: v.sku ?? '',
+        price: v.price == null ? '' : v.price,
         stock: v.stock ?? 0,
       }))
     : [];
@@ -89,12 +80,12 @@ function FormSection({ isMobile, id, title, description, icon, children, default
  * Full-page form. Complex product data doesn't belong in a modal — this needs
  * room, section structure and a persistent save affordance.
  */
-export default function ProductForm({ mode = "create", initial = null, productId }) {
+export default function ProductForm({ mode = 'create', initial = null, productId }) {
   const router = useRouter();
   const dispatch = useDispatch();
   const { t, locale } = useI18n();
   const categories = useSelector((s) => s.categories.all);
-  const isMobile = useMediaQuery("(max-width: 767px)");
+  const isMobile = useMediaQuery('(max-width: 767px)');
 
   const [values, setValues] = useState(() => normalizeProduct(initial));
   const [errors, setErrors] = useState({});
@@ -115,7 +106,7 @@ export default function ProductForm({ mode = "create", initial = null, productId
     const value = e?.target ? e.target.value : e;
     setValues((v) => {
       const next = { ...v, [key]: value };
-      if (key === "name" && !slugTouched) next.slug = slugify(value);
+      if (key === 'name' && !slugTouched) next.slug = slugify(value);
       return next;
     });
     setDirty(true);
@@ -127,17 +118,19 @@ export default function ProductForm({ mode = "create", initial = null, productId
      but the server remains the source of truth. */
   const validate = () => {
     const e = {};
-    if (!values.name.trim()) e.name = t("validation.nameRequired");
-    else if (values.name.trim().length < 3) e.name = t("validation.nameMin");
-    if (!values.sku.trim()) e.sku = t("validation.skuRequired");
-    if (!values.categoryId) e.categoryId = t("validation.categoryRequired");
-    if (values.price === "" || values.price == null) e.price = t("validation.priceRequired");
-    else if (!(parseFloat(values.price) > 0)) e.price = t("validation.pricePositive");
-    if (values.compareAt && parseFloat(values.compareAt) <= parseFloat(values.price)) e.compareAt = t("validation.compareAt");
-    if (values.cost && parseFloat(values.cost) < 0) e.cost = t("validation.costNegative");
-    if (values.stock === "" || values.stock == null) e.stock = t("validation.stockRequired");
-    else if (parseInt(values.stock, 10) < 0) e.stock = t("validation.stockNegative");
-    if (values.metaDescription && values.metaDescription.length > 160) e.metaDescription = t("validation.metaMax");
+    if (!values.name.trim()) e.name = t('validation.nameRequired');
+    else if (values.name.trim().length < 3) e.name = t('validation.nameMin');
+    if (!values.sku.trim()) e.sku = t('validation.skuRequired');
+    if (!values.categoryId) e.categoryId = t('validation.categoryRequired');
+    if (values.price === '' || values.price == null) e.price = t('validation.priceRequired');
+    else if (!(parseFloat(values.price) > 0)) e.price = t('validation.pricePositive');
+    if (values.compareAt && parseFloat(values.compareAt) <= parseFloat(values.price))
+      e.compareAt = t('validation.compareAt');
+    if (values.cost && parseFloat(values.cost) < 0) e.cost = t('validation.costNegative');
+    if (values.stock === '' || values.stock == null) e.stock = t('validation.stockRequired');
+    else if (parseInt(values.stock, 10) < 0) e.stock = t('validation.stockNegative');
+    if (values.metaDescription && values.metaDescription.length > 160)
+      e.metaDescription = t('validation.metaMax');
     return e;
   };
 
@@ -155,18 +148,26 @@ export default function ProductForm({ mode = "create", initial = null, productId
     setErrors({});
     try {
       const payload = { ...values, tags: values.tags };
-      const res = mode === "create" ? await api("/api/products", { method: "POST", body: payload }) : await api(`/api/products/${productId}`, { method: "PUT", body: payload });
+      const res =
+        mode === 'create'
+          ? await api('/api/products', { method: 'POST', body: payload })
+          : await api(`/api/products/${productId}`, { method: 'PUT', body: payload });
 
-      dispatch(toast.success(mode === "create" ? t("toast.productCreated") : t("toast.productSaved"), t("toast.productNow", { name: res.data.name, status: t(`status.${res.data.status}`) })));
+      dispatch(
+        toast.success(
+          mode === 'create' ? t('toast.productCreated') : t('toast.productSaved'),
+          t('toast.productNow', { name: res.data.name, status: t(`status.${res.data.status}`) })
+        )
+      );
       setDirty(false);
       router.push(`/products/${res.data.id}`);
     } catch (err) {
       if (err.errors) {
         setErrors(err.errors);
         requestAnimationFrame(() => errorSummaryRef.current?.focus());
-        dispatch(toast.error(t("toast.productSaveError"), t("toast.productSaveFields")));
+        dispatch(toast.error(t('toast.productSaveError'), t('toast.productSaveFields')));
       } else {
-        dispatch(toast.error(t("toast.productSaveError"), err.message));
+        dispatch(toast.error(t('toast.productSaveError'), err.message));
       }
       setSubmitting(false);
     }
@@ -175,7 +176,10 @@ export default function ProductForm({ mode = "create", initial = null, productId
   const addVariant = () => {
     setValues((v) => ({
       ...v,
-      variants: [...v.variants, { id: `new-${Date.now()}`, size: "", color: "", sku: "", price: "", stock: 0 }],
+      variants: [
+        ...v.variants,
+        { id: `new-${Date.now()}`, size: '', color: '', sku: '', price: '', stock: 0 },
+      ],
     }));
     setDirty(true);
   };
@@ -194,24 +198,35 @@ export default function ProductForm({ mode = "create", initial = null, productId
   };
 
   const errorList = Object.entries(errors).filter(([, v]) => v);
-  const margin = values.price && values.cost ? ((parseFloat(values.price) - parseFloat(values.cost)) / parseFloat(values.price)) * 100 : null;
+  const margin =
+    values.price && values.cost
+      ? ((parseFloat(values.price) - parseFloat(values.cost)) / parseFloat(values.price)) * 100
+      : null;
 
-  const categoryOptions = categories.map((c) => ({ value: c.id, label: localized(c, "name", locale) }));
+  const categoryOptions = categories.map((c) => ({ value: c.id, label: localized(c, 'name', locale) }));
 
   return (
     <form onSubmit={submit} noValidate className="flex flex-col gap-5 pb-24">
       <div className="flex items-start gap-3">
-        <IconButton icon={ArrowLeft} label="Back to products" variant="secondary" onClick={() => router.back()} className="mt-1 shrink-0" />
+        <IconButton
+          icon={ArrowLeft}
+          label="Back to products"
+          variant="secondary"
+          onClick={() => router.back()}
+          className="mt-1 shrink-0"
+        />
         <div className="min-w-0">
-          <h1 className="text-h1 text-ink">{mode === "create" ? t("form.addProduct") : t("form.editProduct")}</h1>
-          <p className="mt-1 text-body text-ink-2">{mode === "create" ? t("form.addProductHint") : t("form.editProductHint")}</p>
+          <h1 className="text-h1 text-ink">{mode === 'create' ? t('form.addProduct') : t('form.editProduct')}</h1>
+          <p className="mt-1 text-body text-ink-2">
+            {mode === 'create' ? t('form.addProductHint') : t('form.editProductHint')}
+          </p>
         </div>
       </div>
 
       {/* Error summary — one place to see everything that needs fixing */}
       {errorList.length > 0 && (
         <div ref={errorSummaryRef} tabIndex={-1} className="focus:outline-none">
-          <Alert tone="danger" title={errorList.length === 1 ? t("validation.fieldNeed") : t("validation.fieldsNeed", { n: errorList.length })}>
+          <Alert tone="danger" title={errorList.length === 1 ? t('validation.fieldNeed') : t('validation.fieldsNeed', { n: errorList.length })}>
             <ul className="mt-1 list-inside list-disc space-y-0.5">
               {errorList.map(([key, msg]) => (
                 <li key={key}>{msg}</li>
@@ -224,25 +239,58 @@ export default function ProductForm({ mode = "create", initial = null, productId
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1fr)_320px]">
         {/* Main column */}
         <div className="flex flex-col gap-4">
-          <FormSection isMobile={isMobile} id="info" title={t("form.info")} description="The essentials customers see first" icon={Package} defaultOpen>
-            <Input label={t("form.name")} required placeholder="e.g. Merino Wool Crew Sweater" value={values.name ?? ""} onChange={set("name")} error={errors.name} autoComplete="off" />
-            <Input label={t("form.nameFa")} placeholder="مثلاً هودی اورسایز کلاسیک" value={values.nameFa || ""} onChange={set("nameFa")} dir="rtl" lang="fa" autoComplete="off" />
+          <FormSection isMobile={isMobile} id="info" title={t('form.info')} description="The essentials customers see first" icon={Package} defaultOpen>
+            <Input
+              label={t('form.name')}
+              required
+              placeholder="e.g. Merino Wool Crew Sweater"
+              value={values.name ?? ''}
+              onChange={set('name')}
+              error={errors.name}
+              autoComplete="off"
+            />
+            <Input
+              label={t('form.nameFa')}
+              placeholder="مثلاً هودی اورسایز کلاسیک"
+              value={values.nameFa || ''}
+              onChange={set('nameFa')}
+              dir="rtl"
+              lang="fa"
+              autoComplete="off"
+            />
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-              <Input label={t("form.sku")} required placeholder="AP-MER-022" value={values.sku ?? ""} onChange={set("sku")} error={errors.sku} hint={!errors.sku ? "A unique code for your inventory system." : undefined} autoComplete="off" />
-              <Select label={t("form.category")} required placeholder={t("form.selectCategory")} options={categoryOptions} value={values.categoryId ?? ""} onChange={set("categoryId")} error={errors.categoryId} />
+              <Input
+                label={t('form.sku')}
+                required
+                placeholder="AP-MER-022"
+                value={values.sku ?? ''}
+                onChange={set('sku')}
+                error={errors.sku}
+                hint={!errors.sku ? 'A unique code for your inventory system.' : undefined}
+                autoComplete="off"
+              />
+              <Select
+                label={t('form.category')}
+                required
+                placeholder={t('form.selectCategory')}
+                options={categoryOptions}
+                value={values.categoryId ?? ''}
+                onChange={set('categoryId')}
+                error={errors.categoryId}
+              />
             </div>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-              <Select label={t("form.brand")} options={BRANDS.map((b) => ({ value: b, label: b }))} value={values.brand} onChange={set("brand")} />
-              <Select label={t("form.supplier")} options={SUPPLIERS.map((s) => ({ value: s, label: s }))} value={values.supplier} onChange={set("supplier")} />
+              <Select label={t('form.brand')} options={BRANDS.map((b) => ({ value: b, label: b }))} value={values.brand} onChange={set('brand')} />
+              <Select label={t('form.supplier')} options={SUPPLIERS.map((s) => ({ value: s, label: s }))} value={values.supplier} onChange={set('supplier')} />
             </div>
           </FormSection>
 
-          <FormSection isMobile={isMobile} id="media" title={t("form.media")} description="Images shown on the product page" icon={ImageIcon}>
+          <FormSection isMobile={isMobile} id="media" title={t('form.media')} description="Images shown on the product page" icon={ImageIcon}>
             <div className="max-w-sm">
               <ProductGallery
-                key={productId || "new-product"}
-                productId={productId || "new-product"}
-                name={values.name || t("form.newProduct")}
+                key={productId || 'new-product'}
+                productId={productId || 'new-product'}
+                name={values.name || t('form.newProduct')}
                 images={values.images}
                 editable
                 onChange={(next) => {
@@ -256,46 +304,101 @@ export default function ProductForm({ mode = "create", initial = null, productId
             </div>
           </FormSection>
 
-          <FormSection isMobile={isMobile} id="pricing" title={t("form.pricing")} description="What the customer pays and what it costs you" icon={DollarSign}>
+          <FormSection isMobile={isMobile} id="pricing" title={t('form.pricing')} description="What the customer pays and what it costs you" icon={DollarSign}>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-              <Input label={t("form.price")} required type="number" step="0.01" min="0" prefix="$" placeholder="0.00" className="pl-7" value={values.price ?? ""} onChange={set("price")} error={errors.price} />
-              <Input label={t("form.compareAt")} type="number" step="0.01" min="0" prefix="$" placeholder="0.00" className="pl-7" value={values.compareAt ?? ""} onChange={set("compareAt")} error={errors.compareAt} hint={!errors.compareAt ? "Shown struck through." : undefined} />
-              <Input label={t("form.cost")} type="number" step="0.01" min="0" prefix="$" placeholder="0.00" className="pl-7" value={values.cost ?? ""} onChange={set("cost")} error={errors.cost} />
+              <Input
+                label={t('form.price')}
+                required
+                type="number"
+                step="0.01"
+                min="0"
+                prefix="$"
+                placeholder="0.00"
+                className="pl-7"
+                value={values.price ?? ''}
+                onChange={set('price')}
+                error={errors.price}
+              />
+              <Input
+                label={t('form.compareAt')}
+                type="number"
+                step="0.01"
+                min="0"
+                prefix="$"
+                placeholder="0.00"
+                className="pl-7"
+                value={values.compareAt ?? ''}
+                onChange={set('compareAt')}
+                error={errors.compareAt}
+                hint={!errors.compareAt ? 'Shown struck through.' : undefined}
+              />
+              <Input
+                label={t('form.cost')}
+                type="number"
+                step="0.01"
+                min="0"
+                prefix="$"
+                placeholder="0.00"
+                className="pl-7"
+                value={values.cost ?? ''}
+                onChange={set('cost')}
+                error={errors.cost}
+              />
             </div>
             {margin != null && Number.isFinite(margin) && (
               <div className="flex flex-wrap items-center gap-4 rounded-card bg-surface-2 px-4 py-3 text-body-sm">
                 <span className="text-ink-2">
-                  {t("form.profit")} <span className="font-semibold tabular-nums text-ink">{currency(parseFloat(values.price) - parseFloat(values.cost))}</span>
+                  {t('form.profit')} <span className="font-semibold tabular-nums text-ink">{currency(parseFloat(values.price) - parseFloat(values.cost))}</span>
                 </span>
                 <span className="text-ink-2">
-                  {t("form.margin")} <span className={cn("font-semibold tabular-nums", margin >= 40 ? "text-success-text" : "text-warning-text")}>{margin.toFixed(1)}%</span>
+                  {t('form.margin')}{' '}
+                  <span className={cn('font-semibold tabular-nums', margin >= 40 ? 'text-success-text' : 'text-warning-text')}>
+                    {margin.toFixed(1)}%
+                  </span>
                 </span>
               </div>
             )}
             <Select
-              label={t("form.tax")}
+              label={t('form.tax')}
               options={[
-                { value: "standard", label: t("form.taxStandard") },
-                { value: "reduced", label: t("form.taxReduced") },
-                { value: "exempt", label: t("form.taxExempt") },
+                { value: 'standard', label: t('form.taxStandard') },
+                { value: 'reduced', label: t('form.taxReduced') },
+                { value: 'exempt', label: t('form.taxExempt') },
               ]}
               defaultValue="standard"
             />
           </FormSection>
 
-          <FormSection isMobile={isMobile} id="inventory" title={t("form.inventory")} description="Stock levels and reorder alerts" icon={Boxes}>
+          <FormSection isMobile={isMobile} id="inventory" title={t('form.inventory')} description="Stock levels and reorder alerts" icon={Boxes}>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-              <Input label={t("form.stockQty")} required type="number" min="0" placeholder="0" value={values.stock ?? ""} onChange={set("stock")} error={errors.stock} />
-              <Input label={t("form.threshold")} type="number" min="0" placeholder="10" value={values.threshold ?? ""} onChange={set("threshold")} hint="You’ll be alerted at or below this level." />
+              <Input
+                label={t('form.stockQty')}
+                required
+                type="number"
+                min="0"
+                placeholder="0"
+                value={values.stock ?? ''}
+                onChange={set('stock')}
+                error={errors.stock}
+              />
+              <Input
+                label={t('form.threshold')}
+                type="number"
+                min="0"
+                placeholder="10"
+                value={values.threshold ?? ''}
+                onChange={set('threshold')}
+                hint="You’ll be alerted at or below this level."
+              />
             </div>
           </FormSection>
 
-          <FormSection isMobile={isMobile} id="variants" title={t("form.variants")} description="Sizes, colours and their own stock" icon={Layers}>
+          <FormSection isMobile={isMobile} id="variants" title={t('form.variants')} description="Sizes, colours and their own stock" icon={Layers}>
             {values.variants.length === 0 ? (
               <div className="rounded-card border border-dashed border-line-strong px-4 py-8 text-center">
-                <p className="text-body-sm text-ink-2">{t("form.noVariants")}</p>
+                <p className="text-body-sm text-ink-2">{t('form.noVariants')}</p>
                 <Button type="button" variant="secondary" size="sm" icon={Plus} className="mt-3" onClick={addVariant}>
-                  {t("form.addVariant")}
+                  {t('form.addVariant')}
                 </Button>
               </div>
             ) : (
@@ -304,46 +407,75 @@ export default function ProductForm({ mode = "create", initial = null, productId
                   <table className="w-full text-body-sm">
                     <thead>
                       <tr className="border-b border-line">
-                        <th scope="col" className="pb-2 pr-3 text-left text-micro uppercase tracking-wide text-ink-3">
-                          {t("form.size")}
-                        </th>
-                        <th scope="col" className="pb-2 pr-3 text-left text-micro uppercase tracking-wide text-ink-3">
-                          {t("form.color")}
-                        </th>
-                        <th scope="col" className="pb-2 pr-3 text-left text-micro uppercase tracking-wide text-ink-3">
-                          {t("form.sku")}
-                        </th>
-                        <th scope="col" className="pb-2 pr-3 text-right text-micro uppercase tracking-wide text-ink-3">
-                          {t("form.price")}
-                        </th>
-                        <th scope="col" className="pb-2 pr-3 text-right text-micro uppercase tracking-wide text-ink-3">
-                          {t("form.stock")}
-                        </th>
-                        <th scope="col" className="pb-2">
-                          <span className="sr-only">Remove</span>
-                        </th>
+                        <th scope="col" className="pb-2 pr-3 text-left text-micro uppercase tracking-wide text-ink-3">{t('form.size')}</th>
+                        <th scope="col" className="pb-2 pr-3 text-left text-micro uppercase tracking-wide text-ink-3">{t('form.color')}</th>
+                        <th scope="col" className="pb-2 pr-3 text-left text-micro uppercase tracking-wide text-ink-3">{t('form.sku')}</th>
+                        <th scope="col" className="pb-2 pr-3 text-right text-micro uppercase tracking-wide text-ink-3">{t('form.price')}</th>
+                        <th scope="col" className="pb-2 pr-3 text-right text-micro uppercase tracking-wide text-ink-3">{t('form.stock')}</th>
+                        <th scope="col" className="pb-2"><span className="sr-only">Remove</span></th>
                       </tr>
                     </thead>
                     <tbody>
                       {values.variants.map((v, i) => (
                         <tr key={v.id} className="border-b border-line last:border-0">
                           <td className="py-2 pr-3">
-                            <input aria-label={`Variant ${i + 1} size`} value={v.size || ""} onChange={(e) => updateVariant(i, "size", e.target.value)} placeholder="M" className="h-8 w-20 rounded-control border border-line-strong bg-surface px-2 text-body-sm focus:border-brand focus:outline-none focus:ring-[3px] focus:ring-brand/20" />
+                            <input
+                              aria-label={`Variant ${i + 1} size`}
+                              value={v.size || ''}
+                              onChange={(e) => updateVariant(i, 'size', e.target.value)}
+                              placeholder="M"
+                              className="h-8 w-20 rounded-control border border-line-strong bg-surface px-2 text-body-sm focus:border-brand focus:outline-none focus:ring-[3px] focus:ring-brand/20"
+                            />
                           </td>
                           <td className="py-2 pr-3">
-                            <input aria-label={`Variant ${i + 1} color`} value={v.color || ""} onChange={(e) => updateVariant(i, "color", e.target.value)} placeholder="Charcoal" className="h-8 w-28 rounded-control border border-line-strong bg-surface px-2 text-body-sm focus:border-brand focus:outline-none focus:ring-[3px] focus:ring-brand/20" />
+                            <input
+                              aria-label={`Variant ${i + 1} color`}
+                              value={v.color || ''}
+                              onChange={(e) => updateVariant(i, 'color', e.target.value)}
+                              placeholder="Charcoal"
+                              className="h-8 w-28 rounded-control border border-line-strong bg-surface px-2 text-body-sm focus:border-brand focus:outline-none focus:ring-[3px] focus:ring-brand/20"
+                            />
                           </td>
                           <td className="py-2 pr-3">
-                            <input aria-label={`Variant ${i + 1} SKU`} value={v.sku || ""} onChange={(e) => updateVariant(i, "sku", e.target.value)} placeholder="AP-MER-M-CHA" className="h-8 w-36 rounded-control border border-line-strong bg-surface px-2 font-mono text-caption focus:border-brand focus:outline-none focus:ring-[3px] focus:ring-brand/20" />
+                            <input
+                              aria-label={`Variant ${i + 1} SKU`}
+                              value={v.sku || ''}
+                              onChange={(e) => updateVariant(i, 'sku', e.target.value)}
+                              placeholder="AP-MER-M-CHA"
+                              className="h-8 w-36 rounded-control border border-line-strong bg-surface px-2 font-mono text-caption focus:border-brand focus:outline-none focus:ring-[3px] focus:ring-brand/20"
+                            />
                           </td>
                           <td className="py-2 pr-3 text-right">
-                            <input aria-label={`Variant ${i + 1} price`} type="number" step="0.01" value={v.price ?? ""} onChange={(e) => updateVariant(i, "price", e.target.value)} placeholder={values.price || "—"} className="h-8 w-24 rounded-control border border-line-strong bg-surface px-2 text-right text-body-sm tabular-nums focus:border-brand focus:outline-none focus:ring-[3px] focus:ring-brand/20" {...numberFocusGuards()} />
+                            <input
+                              aria-label={`Variant ${i + 1} price`}
+                              type="number"
+                              step="0.01"
+                              value={v.price ?? ''}
+                              onChange={(e) => updateVariant(i, 'price', e.target.value)}
+                              placeholder={values.price || '—'}
+                              className="h-8 w-24 rounded-control border border-line-strong bg-surface px-2 text-right text-body-sm tabular-nums focus:border-brand focus:outline-none focus:ring-[3px] focus:ring-brand/20"
+                              {...numberFocusGuards()}
+                            />
                           </td>
                           <td className="py-2 pr-3 text-right">
-                            <input aria-label={`Variant ${i + 1} stock`} type="number" min="0" value={v.stock ?? 0} onChange={(e) => updateVariant(i, "stock", parseInt(e.target.value, 10) || 0)} className="h-8 w-20 rounded-control border border-line-strong bg-surface px-2 text-right text-body-sm tabular-nums focus:border-brand focus:outline-none focus:ring-[3px] focus:ring-brand/20" {...numberFocusGuards()} />
+                            <input
+                              aria-label={`Variant ${i + 1} stock`}
+                              type="number"
+                              min="0"
+                              value={v.stock ?? 0}
+                              onChange={(e) => updateVariant(i, 'stock', parseInt(e.target.value, 10) || 0)}
+                              className="h-8 w-20 rounded-control border border-line-strong bg-surface px-2 text-right text-body-sm tabular-nums focus:border-brand focus:outline-none focus:ring-[3px] focus:ring-brand/20"
+                              {...numberFocusGuards()}
+                            />
                           </td>
                           <td className="py-2 text-right">
-                            <IconButton icon={Trash2} size="sm" variant="danger" label={`Remove variant ${i + 1}`} onClick={() => removeVariant(i)} />
+                            <IconButton
+                              icon={Trash2}
+                              size="sm"
+                              variant="danger"
+                              label={`Remove variant ${i + 1}`}
+                              onClick={() => removeVariant(i)}
+                            />
                           </td>
                         </tr>
                       ))}
@@ -351,30 +483,59 @@ export default function ProductForm({ mode = "create", initial = null, productId
                   </table>
                 </div>
                 <Button type="button" variant="secondary" size="sm" icon={Plus} className="self-start" onClick={addVariant}>
-                  {t("form.addVariant")}
+                  {t('form.addVariant')}
                 </Button>
               </>
             )}
           </FormSection>
 
-          <FormSection isMobile={isMobile} id="description" title={t("form.description")} description={t("form.descriptionHint")} icon={FileText}>
-            <Textarea label={t("form.description")} rows={7} placeholder="Describe the material, fit, features and anything a customer would want to know before buying." value={values.description ?? ""} onChange={set("description")} hint={t("form.descriptionHint")} />
-            <Textarea label={t("form.descriptionFa")} rows={7} placeholder="توضیح فارسی محصول؛ جنس، اندازه و هر چیزی که مشتری باید بداند." value={values.descriptionFa ?? ""} onChange={set("descriptionFa")} dir="rtl" lang="fa" />
+          <FormSection isMobile={isMobile} id="description" title={t('form.description')} description={t('form.descriptionHint')} icon={FileText}>
+            <Textarea
+              label={t('form.description')}
+              rows={7}
+              placeholder="Describe the material, fit, features and anything a customer would want to know before buying."
+              value={values.description ?? ''}
+              onChange={set('description')}
+              hint={t('form.descriptionHint')}
+            />
+            <Textarea
+              label={t('form.descriptionFa')}
+              rows={7}
+              placeholder="توضیح فارسی محصول؛ جنس، اندازه و هر چیزی که مشتری باید بداند."
+              value={values.descriptionFa ?? ''}
+              onChange={set('descriptionFa')}
+              dir="rtl"
+              lang="fa"
+            />
           </FormSection>
 
-          <FormSection isMobile={isMobile} id="seo" title={t("form.seo")} description="How this product appears in search results" icon={SearchIcon}>
-            <Input label={t("form.seoTitle")} placeholder={values.name ? `${values.name} | Nexora Store` : "Product name | Nexora Store"} value={values.seoTitle ?? ""} onChange={set("seoTitle")} hint="Aim for 50–60 characters." />
-            <Textarea label={t("form.meta")} rows={3} maxLength={160} placeholder="A short summary that appears under the title in search results." value={values.metaDescription ?? ""} onChange={set("metaDescription")} error={errors.metaDescription} />
+          <FormSection isMobile={isMobile} id="seo" title={t('form.seo')} description="How this product appears in search results" icon={SearchIcon}>
             <Input
-              label={t("form.slug")}
+              label={t('form.seoTitle')}
+              placeholder={values.name ? `${values.name} | Nexora Store` : 'Product name | Nexora Store'}
+              value={values.seoTitle ?? ''}
+              onChange={set('seoTitle')}
+              hint="Aim for 50–60 characters."
+            />
+            <Textarea
+              label={t('form.meta')}
+              rows={3}
+              maxLength={160}
+              placeholder="A short summary that appears under the title in search results."
+              value={values.metaDescription ?? ''}
+              onChange={set('metaDescription')}
+              error={errors.metaDescription}
+            />
+            <Input
+              label={t('form.slug')}
               prefix=""
               placeholder="merino-wool-crew-sweater"
-              value={values.slug ?? ""}
+              value={values.slug ?? ''}
               onChange={(e) => {
                 setSlugTouched(true);
-                set("slug")(e);
+                set('slug')(e);
               }}
-              hint={`nexora.com/products/${values.slug || "your-product"}`}
+              hint={`nexora.com/products/${values.slug || 'your-product'}`}
               className="font-mono text-body-sm"
             />
           </FormSection>
@@ -383,42 +544,50 @@ export default function ProductForm({ mode = "create", initial = null, productId
         {/* Side column */}
         <aside className="flex flex-col gap-4">
           <Card>
-            <CardHeader title={t("form.visibility")} />
+            <CardHeader title={t('form.visibility')} />
             <CardBody className="flex flex-col gap-4">
               <Select
-                label={t("form.status")}
+                label={t('form.status')}
                 options={[
-                  { value: "active", label: t("form.statusActive") },
-                  { value: "draft", label: t("form.statusDraft") },
-                  { value: "archived", label: t("form.statusArchived") },
+                  { value: 'active', label: t('form.statusActive') },
+                  { value: 'draft', label: t('form.statusDraft') },
+                  { value: 'archived', label: t('form.statusArchived') },
                 ]}
                 value={values.status}
-                onChange={set("status")}
+                onChange={set('status')}
               />
-              <p className="text-caption leading-relaxed text-ink-3">{values.status === "active" ? "This product is purchasable on your storefront." : values.status === "draft" ? "Drafts are only visible to your team. Publish when you’re ready." : "Archived products keep their order history but are hidden from customers."}</p>
+              <p className="text-caption leading-relaxed text-ink-3">
+                {values.status === 'active'
+                  ? 'This product is purchasable on your storefront.'
+                  : values.status === 'draft'
+                  ? 'Drafts are only visible to your team. Publish when you’re ready.'
+                  : 'Archived products keep their order history but are hidden from customers.'}
+              </p>
             </CardBody>
           </Card>
 
           <Card>
-            <CardHeader title={t("form.summary")} />
+            <CardHeader title={t('form.summary')} />
             <CardBody>
               <dl className="divide-y divide-line text-body-sm">
                 <div className="flex justify-between gap-3 py-2">
-                  <dt className="text-ink-2">{t("form.price")}</dt>
-                  <dd className="font-medium tabular-nums text-ink">{values.price ? currency(parseFloat(values.price)) : "—"}</dd>
+                  <dt className="text-ink-2">{t('form.price')}</dt>
+                  <dd className="font-medium tabular-nums text-ink">
+                    {values.price ? currency(parseFloat(values.price)) : '—'}
+                  </dd>
                 </div>
                 <div className="flex justify-between gap-3 py-2">
-                  <dt className="text-ink-2">{t("form.stock")}</dt>
-                  <dd className="font-medium tabular-nums text-ink">{values.stock || "—"}</dd>
+                  <dt className="text-ink-2">{t('form.stock')}</dt>
+                  <dd className="font-medium tabular-nums text-ink">{values.stock || '—'}</dd>
                 </div>
                 <div className="flex justify-between gap-3 py-2">
-                  <dt className="text-ink-2">{t("form.variants")}</dt>
+                  <dt className="text-ink-2">{t('form.variants')}</dt>
                   <dd className="font-medium tabular-nums text-ink">{values.variants.length}</dd>
                 </div>
                 <div className="flex items-center justify-between gap-3 py-2">
-                  <dt className="text-ink-2">{t("form.status")}</dt>
+                  <dt className="text-ink-2">{t('form.status')}</dt>
                   <dd>
-                    <Badge tone={values.status === "active" ? "success" : values.status === "draft" ? "neutral" : "outline"} dot size="sm">
+                    <Badge tone={values.status === 'active' ? 'success' : values.status === 'draft' ? 'neutral' : 'outline'} dot size="sm">
                       {t(`status.${values.status}`)}
                     </Badge>
                   </dd>
@@ -432,13 +601,15 @@ export default function ProductForm({ mode = "create", initial = null, productId
       {/* Sticky action bar */}
       <div className="fixed inset-x-0 bottom-0 z-30 border-t border-line bg-surface/95 backdrop-blur-md">
         <div className="mx-auto flex max-w-[1440px] items-center justify-between gap-3 px-4 py-3 sm:px-5 lg:px-6">
-          <p className="hidden text-caption text-ink-3 sm:block">{dirty ? t("common.unsaved") : mode === "create" ? t("form.requiredHint") : t("common.saved")}</p>
+          <p className="hidden text-caption text-ink-3 sm:block">
+            {dirty ? t('common.unsaved') : mode === 'create' ? t('form.requiredHint') : t('common.saved')}
+          </p>
           <div className="flex flex-1 items-center justify-end gap-2 sm:flex-none">
             <Button type="button" variant="secondary" onClick={() => router.back()} disabled={submitting} className="flex-1 sm:flex-none">
-              {t("common.cancel")}
+              {t('common.cancel')}
             </Button>
             <Button type="submit" variant="primary" loading={submitting} className="flex-1 sm:flex-none">
-              {submitting ? t("common.saving") : mode === "create" ? t("form.saveProduct") : t("common.save")}
+              {submitting ? t('common.saving') : mode === 'create' ? t('form.saveProduct') : t('common.save')}
             </Button>
           </div>
         </div>

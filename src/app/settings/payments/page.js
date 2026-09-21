@@ -1,39 +1,34 @@
-'use client';
+"use client";
 
-import { CreditCard, Wallet, Landmark, Info } from 'lucide-react';
-import { useI18n } from '@/i18n/I18nProvider';
-import { useSettingsSection } from '@/lib/settingsStore';
-import SettingsLayout from '@/components/layout/SettingsLayout';
-import Card, { CardHeader, CardBody } from '@/components/ui/Card';
-import Input from '@/components/ui/Input';
-import Select from '@/components/ui/Select';
-import Switch from '@/components/ui/Switch';
-import Alert from '@/components/ui/Alert';
-import Badge from '@/components/ui/Badge';
+import { CreditCard, Wallet, Landmark, Info } from "lucide-react";
+import { useI18n } from "@/i18n/I18nProvider";
+import { useSettingsSection } from "@/lib/settingsStore";
+import SettingsLayout from "@/components/layout/SettingsLayout";
+import Card, { CardHeader, CardBody } from "@/components/ui/Card";
+import Input from "@/components/ui/Input";
+import Select from "@/components/ui/Select";
+import Switch from "@/components/ui/Switch";
+import Alert from "@/components/ui/Alert";
+import Badge from "@/components/ui/Badge";
 
 const PROVIDERS = [
-  { id: 'stripe', name: 'Stripe', description: 'Cards, Apple Pay and Google Pay', icon: CreditCard, connected: true, fee: '1.4% + $0.25' },
-  { id: 'paypal', name: 'PayPal', description: 'PayPal balance and Pay in 3', icon: Wallet, connected: true, fee: '2.9% + $0.30' },
-  { id: 'bank', name: 'Bank transfer', description: 'Manual SEPA and wire payments', icon: Landmark, connected: false, fee: 'No fee' },
+  { id: "stripe", name: "Stripe", description: "Cards, Apple Pay and Google Pay", icon: CreditCard, connected: true, fee: "1.4% + $0.25" },
+  { id: "paypal", name: "PayPal", description: "PayPal balance and Pay in 3", icon: Wallet, connected: true, fee: "2.9% + $0.30" },
+  { id: "bank", name: "Bank transfer", description: "Manual SEPA and wire payments", icon: Landmark, connected: false, fee: "No fee" },
 ];
 
 export default function PaymentSettingsPage() {
   const { t } = useI18n();
-  const { form, patch, setForm, dirty, setDirty, save } = useSettingsSection('payments');
+  const { form, patch, setForm, dirty, setDirty, save } = useSettingsSection("payments");
 
   return (
-    <SettingsLayout
-      title={t('settings.payments')}
-      description={t('settingsPages.generalHint')}
-      dirty={dirty}
-      onSave={save}
-    >
-      <Alert tone="info" icon={Info} title={t('settingsPages.storeDetails')}>
-        {t('auth.blurb')}
+    <SettingsLayout title={t("settings.payments")} description={t("settingsPages.generalHint")} dirty={dirty} onSave={save}>
+      <Alert tone="info" icon={Info} title={t("settingsPages.storeDetails")}>
+        {t("auth.blurb")}
       </Alert>
 
       <Card>
-        <CardHeader title={t('settings.payments')} />
+        <CardHeader title={t("settings.payments")} />
         <ul>
           {PROVIDERS.map((p) => {
             const Icon = p.icon;
@@ -46,9 +41,13 @@ export default function PaymentSettingsPage() {
                   <div className="flex flex-wrap items-center gap-2">
                     <p className="text-body-sm font-semibold text-ink">{p.name}</p>
                     {p.connected ? (
-                      <Badge tone="success" dot size="sm">{t('status.active')}</Badge>
+                      <Badge tone="success" dot size="sm">
+                        {t("status.active")}
+                      </Badge>
                     ) : (
-                      <Badge tone="neutral" dot size="sm">{t('status.inactive')}</Badge>
+                      <Badge tone="neutral" dot size="sm">
+                        {t("status.inactive")}
+                      </Badge>
                     )}
                   </div>
                   <p className="mt-0.5 text-caption text-ink-3">
@@ -57,7 +56,10 @@ export default function PaymentSettingsPage() {
                 </div>
                 <Switch
                   checked={Boolean(form[p.id])}
-                  onChange={(v) => { setForm((f) => ({ ...f, [p.id]: v })); setDirty(true); }}
+                  onChange={(v) => {
+                    setForm((f) => ({ ...f, [p.id]: v }));
+                    setDirty(true);
+                  }}
                   id={`provider-${p.id}`}
                 />
               </li>
@@ -67,33 +69,33 @@ export default function PaymentSettingsPage() {
       </Card>
 
       <Card>
-        <CardHeader title={t('settingsPages.regional')} />
+        <CardHeader title={t("settingsPages.regional")} />
         <CardBody className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <Select
-            label={t('settingsPages.currency')}
+            label={t("settingsPages.payoutSchedule")}
             value={form.payout}
-            onChange={patch('payout')}
+            onChange={patch("payout")}
             options={[
-              { value: 'daily', label: 'Daily' },
-              { value: 'weekly', label: 'Weekly (Mondays)' },
-              { value: 'monthly', label: 'Monthly (1st)' },
+              { value: "daily", label: t("settingsPages.payoutDaily") },
+              { value: "weekly", label: t("settingsPages.payoutWeekly") },
+              { value: "monthly", label: t("settingsPages.payoutMonthly") },
             ]}
           />
-          <Input label={t('settingsPages.supportHours')} defaultValue="DE89 •••• •••• 3241" disabled className="font-mono" />
+          <Input label={t("settingsPages.payoutAccount")} value="DE89 •••• •••• 3241" disabled className="font-mono" />
         </CardBody>
       </Card>
 
       <Card>
-        <CardHeader title={t('settingsPages.businessInfo')} />
+        <CardHeader title={t("settingsPages.businessInfo")} />
         <CardBody className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <Input label={t('form.name')} type="number" value={form.taxRate} onChange={patch('taxRate')} suffix="%" />
+          <Input label={t("settingsPages.taxRate")} type="number" value={form.taxRate} onChange={patch("taxRate")} suffix="%" />
           <Select
-            label={t('settingsPages.regional')}
+            label={t("settingsPages.taxInclusive")}
             value={form.taxInclusive}
-            onChange={patch('taxInclusive')}
+            onChange={patch("taxInclusive")}
             options={[
-              { value: 'yes', label: t('common.yes') },
-              { value: 'no', label: t('common.no') },
+              { value: "yes", label: t("common.yes") },
+              { value: "no", label: t("common.no") },
             ]}
           />
         </CardBody>

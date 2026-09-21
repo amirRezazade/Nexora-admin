@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
 import { Menu, Search, Bell, Sun, Moon, Monitor, LogOut, User, Settings as SettingsIcon, CheckCheck, Package, ShoppingCart, Star, Server, ChevronDown } from "lucide-react";
 import { cn, relativeTime } from "@/lib/format";
@@ -136,7 +136,7 @@ function NotificationPopover() {
             )}
           </div>
 
-          <div className="max-h-[360px] overflow-y-auto">
+          <div className="max-h-82.5 overflow-y-auto">
             {status === "loading" && !items.length ? (
               <SkeletonList rows={4} />
             ) : items.length === 0 ? (
@@ -229,6 +229,7 @@ function ThemeToggle() {
 function UserMenu() {
   const { t } = useI18n();
   const dispatch = useDispatch();
+  const router = useRouter();
   const user = useSelector((s) => s.auth.user);
 
   return (
@@ -260,13 +261,19 @@ function UserMenu() {
           </MenuItem>
           <MenuSeparator />
           <MenuItem
-            as={Link}
-            href="/login"
             icon={LogOut}
             destructive
-            onClick={() => {
-              dispatch(signOut());
+            onClick={async () => {
               close();
+              /* Wait for the session to actually end before navigating —
+                 navigating first re-triggers AppShell's "logged-in user on
+                 /login" bounce and kicks the user back to the dashboard. */
+              try {
+                await dispatch(signOut()).unwrap();
+              } catch {
+                /* state settles to signed-out either way */
+              }
+              router.push("/login");
             }}
           >
             {t("header.signOut")}

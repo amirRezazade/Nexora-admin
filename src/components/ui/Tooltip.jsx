@@ -25,6 +25,7 @@ export default function Tooltip({ content, side = 'top', children, className, de
     const tipW = tip?.offsetWidth || 0;
     const tipH = tip?.offsetHeight || 0;
     const gap = 8;
+    const pad = 8;
     let top = 0;
     let left = 0;
 
@@ -33,11 +34,14 @@ export default function Tooltip({ content, side = 'top', children, className, de
 
     if (towardEnd || towardStart) {
       top = r.top + r.height / 2 - tipH / 2;
-      if (towardEnd) {
-        left = rtl ? r.left - gap - tipW : r.right + gap;
-      } else {
-        left = rtl ? r.right + gap : r.left - gap - tipW;
-      }
+      /* Prefer the requested side, but never cover the trigger or clip off
+         screen — flip to whichever side actually has room for the tooltip. */
+      let goRight = rtl ? towardStart : towardEnd;
+      const roomRight = window.innerWidth - r.right;
+      const roomLeft = r.left;
+      if (goRight && roomRight < tipW + gap + pad) goRight = false;
+      else if (!goRight && roomLeft < tipW + gap + pad) goRight = true;
+      left = goRight ? r.right + gap : r.left - gap - tipW;
     } else if (side === 'bottom') {
       top = r.bottom + gap;
       left = r.left + r.width / 2 - tipW / 2;
@@ -46,7 +50,6 @@ export default function Tooltip({ content, side = 'top', children, className, de
       left = r.left + r.width / 2 - tipW / 2;
     }
 
-    const pad = 8;
     left = Math.max(pad, Math.min(left, window.innerWidth - (tipW || 0) - pad));
     top = Math.max(pad, Math.min(top, window.innerHeight - (tipH || 0) - pad));
     setCoords({ top, left });
@@ -55,10 +58,12 @@ export default function Tooltip({ content, side = 'top', children, className, de
   useLayoutEffect(() => {
     if (!open) return;
     place();
+    const raf = requestAnimationFrame(place); /* width settles after first paint */
     const onReposition = () => place();
     window.addEventListener('scroll', onReposition, true);
     window.addEventListener('resize', onReposition);
     return () => {
+      cancelAnimationFrame(raf);
       window.removeEventListener('scroll', onReposition, true);
       window.removeEventListener('resize', onReposition);
     };

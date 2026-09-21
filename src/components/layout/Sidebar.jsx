@@ -70,7 +70,7 @@ function NavLink({ item, collapsed, unread, onNavigate }) {
       href={item.href}
       onClick={onNavigate}
       aria-current={active ? "page" : undefined}
-      className={cn("group relative flex items-center gap-2.5 rounded-control py-2 text-body-sm font-medium transition-colors duration-150", "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-surface", collapsed ? "justify-center px-0" : "px-2.5", active ? "bg-brand-soft text-brand-text" : "text-ink-2 hover:bg-surface-3 hover:text-ink")}
+      className={cn("group relative flex items-center gap-2.5 rounded-control py-2 text-body-sm font-medium transition-colors duration-150", "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-surface", collapsed ? "justify-center px-3" : "px-2.5", active ? "bg-brand-soft text-brand-text" : "text-ink-2 hover:bg-surface-3 hover:text-ink")}
     >
       {/* Active rail — reinforces selection beyond the tint alone */}
       {active && <span aria-hidden className={cn("absolute rounded-pill bg-brand", collapsed ? "-start-2 top-1/2 h-5 w-1 -translate-y-1/2" : "-start-3 top-1/2 h-5 w-[3px] -translate-y-1/2")} />}

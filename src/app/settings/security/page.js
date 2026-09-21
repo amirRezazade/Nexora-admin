@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { useDispatch } from "react-redux";
 import { Monitor, Smartphone, Tablet, LogOut } from "lucide-react";
 import { relativeTime } from "@/lib/format";
@@ -196,10 +197,17 @@ export default function SecuritySettingsPage() {
       <ConfirmDialog
         open={confirmRevokeAll}
         onClose={() => setConfirmRevokeAll(false)}
-        onConfirm={() => {
+        onConfirm={async () => {
           setConfirmRevokeAll(false);
           dispatch(toast.success(t("toast.signedOutAll"), t("toast.signedOutAllHint")));
-          dispatch(signOut("global"));
+          /* Global sign-out revokes every session incl. this one — wait for
+             it, then land on /login explicitly. */
+          try {
+            await dispatch(signOut("global")).unwrap();
+          } catch {
+            /* state settles to signed-out either way */
+          }
+          router.push("/login");
         }}
         title={t("confirm.signOutAll")}
         message={t("confirm.signOutAllMsg")}

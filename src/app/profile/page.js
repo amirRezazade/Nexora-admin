@@ -2,11 +2,12 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
 import { Camera, Mail, ShieldCheck, LogOut, Upload, Calendar, Award } from "lucide-react";
 import { dateShort, relativeTime } from "@/lib/format";
 import { supabase } from "@/lib/supabaseClient";
-import { updateProfile } from "@/store/slices/authSlice";
+import { updateProfile, signOut } from "@/store/slices/authSlice";
 import { toast } from "@/store/slices/uiSlice";
 import { useI18n } from "@/i18n/I18nProvider";
 
@@ -31,7 +32,9 @@ import { SessionList, SESSIONS } from "@/app/settings/security/page";
 export default function ProfilePage() {
   const { t } = useI18n();
   const dispatch = useDispatch();
+  const router = useRouter();
   const user = useSelector((s) => s.auth.user);
+  const [signingOut, setSigningOut] = useState(false);
 
   const [values, setValues] = useState({
     name: user?.name || "",
@@ -290,8 +293,24 @@ export default function ProfilePage() {
           <Card>
             <CardHeader title={t("profilePage.signOut")} />
             <CardBody>
-              <p className="text-body-sm leading-relaxed text-ink-2">Signing out ends this session on this device only.</p>
-              <Button as={Link} href="/login" variant="secondary" icon={LogOut} className="mt-4 w-full text-danger-text">
+              <p className="text-body-sm leading-relaxed text-ink-2">{t("profilePage.signOutHint")}</p>
+              <Button
+                variant="secondary"
+                icon={LogOut}
+                loading={signingOut}
+                className="mt-4 w-full text-danger-text"
+                onClick={async () => {
+                  /* Same pattern as the header: end the session first, then
+                     navigate — /login would bounce back while still signed in. */
+                  setSigningOut(true);
+                  try {
+                    await dispatch(signOut()).unwrap();
+                  } catch {
+                    /* state settles to signed-out either way */
+                  }
+                  router.push("/login");
+                }}
+              >
                 {t("profilePage.signOut")}
               </Button>
             </CardBody>

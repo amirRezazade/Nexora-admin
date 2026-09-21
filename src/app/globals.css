@@ -166,6 +166,9 @@
     transition-duration: 180ms;
     transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
   }
+  button {
+    cursor: pointer;
+  }
 
   /* Never animate on first paint or during layout-driven changes */
   .no-theme-transition,
@@ -187,7 +190,7 @@
   }
 
   ::selection {
-    background: rgb(var(--c-brand) / 0.82);
+    background: rgb(var(--c-brand) / 0.85);
     color: white;
     opacity: 100;
   }
@@ -242,9 +245,6 @@
   }
   .dark .skeleton::after {
     background-image: linear-gradient(90deg, transparent, rgb(255 255 255 / 0.05), transparent);
-  }
-  button {
-    cursor: pointer;
   }
 
   /* Card primitive */

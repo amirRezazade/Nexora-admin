@@ -6,7 +6,7 @@ begin;
 -- 1) Confirm the admin created via Auth API
 update auth.users
 set email_confirmed_at = coalesce(email_confirmed_at, now())
-where email = 'sarah@novastore.com';
+where email = 'amir.rezazadeh@nexora.com ';
 
 -- 2) Staff profiles (1-1 with auth.users)
 create table if not exists public.profiles (
@@ -49,9 +49,9 @@ create policy "profiles_admin_write"
   with check (public.is_admin());
 
 insert into public.profiles (id, email, name, role)
-select id, email, coalesce(raw_user_meta_data->>'name', 'Sarah Chen'), 'admin'
+select id, email, coalesce(raw_user_meta_data->>'name', 'Amir Rezazadeh'), 'admin'
 from auth.users
-where email = 'sarah@novastore.com'
+where email = 'amir.rezazadeh@nexora.com '
 on conflict (id) do update
   set email = excluded.email,
       name = excluded.name,

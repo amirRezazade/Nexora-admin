@@ -55,7 +55,9 @@ const Input = forwardRef(function Input({ label, hint, error, required, classNam
           ref={ref}
           id={inputId}
           type={type}
-          value={value ?? ""}
+          /* Uncontrolled when the caller passes defaultValue instead of value —
+             passing both makes React warn on every render. */
+          value={value === undefined && props.defaultValue !== undefined ? undefined : (value ?? "")}
           aria-invalid={error ? "true" : undefined}
           aria-describedby={describedBy}
           aria-required={required || undefined}

@@ -20,7 +20,7 @@ export default function AppShell({ children }) {
   const router = useRouter();
   const dispatch = useDispatch();
   const collapsed = useSelector((s) => s.ui.sidebarCollapsed);
-  const { isAuthenticated, bootstrapped } = useSelector((s) => s.auth);
+  const { isAuthenticated, bootstrapped, signingOut } = useSelector((s) => s.auth);
   const { t } = useI18n();
   const bare = BARE_ROUTES.some((r) => pathname.startsWith(r));
 
@@ -55,10 +55,10 @@ export default function AppShell({ children }) {
   }, [pathname, dispatch]);
 
   useEffect(() => {
-    if (!bootstrapped) return;
+    if (!bootstrapped || signingOut) return;
     if (!bare && !isAuthenticated) router.replace('/login');
     if (bare && isAuthenticated && pathname === '/login') router.replace('/');
-  }, [bootstrapped, isAuthenticated, bare, pathname, router]);
+  }, [bootstrapped, isAuthenticated, signingOut, bare, pathname, router]);
 
   if (!bootstrapped) {
     return <div className="min-h-screen bg-canvas" />;

@@ -1,8 +1,8 @@
 export function stockStatus(p) {
   const stock = p.stock ?? p.available ?? 0;
-  if (stock <= 0) return 'out_of_stock';
-  if (stock <= 8) return 'low_stock';
-  return 'in_stock';
+  if (stock <= 0) return "out_of_stock";
+  if (stock <= 8) return "low_stock";
+  return "in_stock";
 }
 
 export function withStock(p) {
@@ -10,7 +10,7 @@ export function withStock(p) {
     ...p,
     threshold: p.threshold ?? 8,
     reserved: p.reserved ?? 0,
-    supplier: p.supplier ?? '',
+    supplier: p.supplier ?? "",
     stockStatus: stockStatus(p),
   };
 }
@@ -22,7 +22,7 @@ export function mapProduct(row) {
   return withStock({
     id: row.id,
     name: row.name,
-    nameFa: row.name_fa || '',
+    nameFa: row.name_fa || "",
     sku: row.sku,
     slug: row.slug,
     categoryId: row.category_id,
@@ -38,10 +38,10 @@ export function mapProduct(row) {
     image: primary?.url || null,
     rating: Number(row.rating) || 0,
     reviewCount: Number(row.review_count) || 0,
-    description: row.description || '',
-    descriptionFa: row.description_fa || '',
-    seoTitle: row.seo_title || '',
-    metaDescription: row.meta_description || '',
+    description: row.description || "",
+    descriptionFa: row.description_fa || "",
+    seoTitle: row.seo_title || "",
+    metaDescription: row.meta_description || "",
     createdAt: row.created_at,
     updatedAt: row.updated_at,
   });
@@ -52,12 +52,12 @@ export function mapCategory(row) {
   return {
     id: row.id,
     name: row.name,
-    nameFa: row.name_fa || '',
+    nameFa: row.name_fa || "",
     slug: row.slug,
     parentId: row.parent_id || null,
     status: row.status,
-    description: row.description || '',
-    descriptionFa: row.description_fa || '',
+    description: row.description || "",
+    descriptionFa: row.description_fa || "",
   };
 }
 
@@ -97,7 +97,7 @@ export function mapOrder(row, items = []) {
     itemCount: row.item_count,
     subtotal: Number(row.subtotal) || 0,
     discount: Number(row.discount) || 0,
-    couponCode: row.coupon_code || '',
+    couponCode: row.coupon_code || "",
     shipping: Number(row.shipping) || 0,
     shippingMethod: row.shipping_method,
     tax: Number(row.tax) || 0,
@@ -108,9 +108,9 @@ export function mapOrder(row, items = []) {
     paymentBrand: row.payment_brand,
     shippingAddress: row.shipping_address,
     billingAddress: row.billing_address,
-    trackingNumber: row.tracking_number || '',
+    trackingNumber: row.tracking_number || "",
     timeline: row.timeline || [],
-    note: row.note || '',
+    note: row.note || "",
   };
 }
 
@@ -144,7 +144,7 @@ export function mapCoupon(row) {
     status: row.status,
     appliesTo: row.applies_to,
     scope: row.scope || [],
-    description: row.description || '',
+    description: row.description || "",
   };
 }
 
@@ -195,12 +195,20 @@ export function mapInventory(row) {
     cost: Number(row.cost) || 0,
     value: Number(row.value) || 0,
     status: row.status,
-    supplier: '',
-    location: '',
+    supplier: "",
+    location: "",
     updatedAt: row.updated_at,
     primaryImage: row.primary_image,
   };
 }
+
+/** Numeric column helper — form inputs send '' when left blank, and Postgres
+ *  rejects '' for numeric columns ("invalid input syntax for type numeric"). */
+const toNum = (v, fallback = null) => {
+  if (v === "" || v === null || v === undefined) return fallback;
+  const n = parseFloat(v);
+  return Number.isFinite(n) ? n : fallback;
+};
 
 export function productToRow(body, extra = {}) {
   return {
@@ -208,18 +216,18 @@ export function productToRow(body, extra = {}) {
     sku: body.sku,
     slug: body.slug,
     category_id: body.categoryId,
-    price: body.price,
-    compare_at: body.compareAt || null,
-    cost: body.cost ?? 0,
-    stock: body.stock ?? 0,
-    status: body.status || 'draft',
-    brand: body.brand || 'Nexora Basics',
+    price: toNum(body.price),
+    compare_at: toNum(body.compareAt),
+    cost: toNum(body.cost, 0),
+    stock: toNum(body.stock, 0),
+    status: body.status || "draft",
+    brand: body.brand || "Nexora Basics",
     tags: body.tags || [],
     variants: body.variants || [],
     images: body.images || [],
-    description: body.description || '',
-    seo_title: body.seoTitle || '',
-    meta_description: body.metaDescription || '',
+    description: body.description || "",
+    seo_title: body.seoTitle || "",
+    meta_description: body.metaDescription || "",
     name_fa: body.nameFa || body.name_fa || null,
     description_fa: body.descriptionFa || body.description_fa || null,
     updated_at: new Date().toISOString().slice(0, 10),
