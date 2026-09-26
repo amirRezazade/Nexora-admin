@@ -1,176 +1,207 @@
-# Nova — E-commerce Admin
+<div align="center">
 
-A production-quality admin platform for a single online store: catalog, orders,
-inventory, customers and analytics. Built with Next.js, React, JavaScript,
-Redux Toolkit, Tailwind CSS and **Supabase** (Postgres + Auth + Storage).
+# 🛍️ Nexora Admin
 
-## Running locally
+### داشبورد مدیریت پیشرفته و حرفه‌ای فروشگاه اینترنتی
 
-Requires **Node.js 18.17+** (built and tested on Node 20). On Windows, Next 16
-must run with Webpack (`npm run dev` already passes `--webpack`).
+[**🌐 مشاهده دمو زنده (Vercel)**](https://nexora-admin-app.vercel.app/) • [**📦 مخزن گیت‌هاب**](#) • [**⚡ گزارش کارایی**](#-کارایی-و-سرعت-lighthouse-97100)
+
+  <br />
+
+![Next.js](https://img.shields.io/badge/Next.js_16-000000?style=for-the-badge&logo=nextdotjs&logoColor=white)
+![React](https://img.shields.io/badge/React_19-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
+![Supabase](https://img.shields.io/badge/Supabase-3ECF8E?style=for-the-badge&logo=supabase&logoColor=white)
+![Tailwind CSS](https://img.shields.io/badge/Tailwind_v4-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)
+![Redux](https://img.shields.io/badge/Redux_Toolkit-764ABC?style=for-the-badge&logo=redux&logoColor=white)
+![Playwright](https://img.shields.io/badge/Playwright_E2E-2EAD33?style=for-the-badge&logo=playwright&logoColor=white)
+
+  <br />
+
+![Nexora Admin Preview](./public/brand/nexora-demo.jpg)
+
+</div>
+
+---
+
+## 📌 معرفی پروژه
+
+**Nexora Admin** یک پنل مدیریت (Admin Dashboard) کامل، پرسرعت، مدرن و حرفه‌ای برای فروشگاه‌های اینترنتی است که با استفاده از آخرین فریم‌ورک‌ها و تکنولوژی‌های وب شامل **Next.js 16 (App Router)**، **React 19**، **Supabase (PostgreSQL + Auth + Storage)** و **Tailwind CSS v4** طراحی و پیاده‌سازی شده است.
+
+این پروژه تمامی بخش‌های کلیدی یک فروشگاه اینترنتی واقعی را پوشش می‌دهد: مدیریت کاتالوگ محصولات، دسته‌بندی‌ها، انبارداری، سفارشات، مشتریان، کدهای تخفیف، نظرات خریداران، گزارش‌های مالی و تحلیلی.
+
+---
+
+## 🌟 ویژگی‌ها و نقاط قوت کلیدی
+
+### ⚡ کارایی و سرعت فوق‌العاده (Lighthouse 97/100)
+
+- **ارزیابی درخشان لایت‌هاوس:** کسب نمره **۹۷/۱۰۰ در Performance**، **۱۰۰/۱۰۰ در SEO**، **۹۶/۱۰۰ در Best Practices** و **۹۱/۱۰۰ در Accessibility**.
+- **فونت‌های اختصاصی بدون بلاک رندر:** استفاده از `next/font/google` برای بارگذاری بهینه فونت‌های Vazirmatn و Inter به صورت محلی.
+- **بارگذاری تنبل چارت‌ها (Lazy Loading):** استفاده از `next/dynamic` برای کدهای سنگین Recharts تا زمان پاسخگویی اولیه (LCP & TBT) به حداقل برسد.
+- **بهینه‌سازی مدرن تصاویر:** استفاده از کامپوننت `next/image` با فرمت‌های AVIF/WebP و تولید خودکار `srcset` متناسب با سایز نمایشگر.
+
+<br />
+
+<div align="center">
+  <img src="./public/brand/lighthouse-score.png" alt="Nexora Admin Lighthouse Audit 97/100" width="520" />
+</div>
+
+<br />
+
+### 🌐 دو زبانه و RTL کامل (Persian & English)
+
+- **پشتیبانی کامل از زبان فارسی و انگلیسی:** با قابلیت سوئیچ لحظه‌ای زبان بدون نیاز به رفرش کامل صفحه.
+- **راست‌چین (RTL) و چپ‌چین (LTR) هوشمند:** تغییر خودکار جهت سند (`dir="rtl"` / `dir="ltr"`)، فونت‌ها، چیدمان آیکون‌ها و انیمیشن‌های سایدبار موبایل.
+- **فرمت‌کننده هوشمند قیمت و اعداد:** نمایش تمیز قیمت‌ها بدون اعشار صفر زاید در فارسی (مثلاً `$۵۹` به‌جای `$۵۹٫۰۰` که با هزارگان اشتباه نشود).
+
+### 🔒 امنیت و احراز هویت سرور-ساید (Server-Side Auth & Middleware)
+
+- **محافظت از مسیرها در سطح سرور (`middleware.js`):** بررسی نشست کاربر از طریق کوکی‌های امن با استفاده از `@supabase/ssr` پیش از رندر صفحات (جلوگیری ۱۰۰٪ از مشاهده محتوای ادمین توسط افراد واردنشده).
+- **قوانین دسترسی دیتابیس (Row Level Security - RLS):** ایمن‌سازی تمام جداول در Supabase طوری که فقط کاربران احراز هویت شده به داده‌ها دسترسی داشته باشند.
+- **قفل محافظت از حساب دمو:** جلوگیری از تغییر ایمیل یا رمز عبور اکانت عمومی دمو توسط بازدیدکنندگان برای حفظ پایداری سیستم.
+
+### 📦 دیتابیس ابری و مدیریت فایل Supabase
+
+- **PostgreSQL ابری:** اتصال مستقیم به Supabase با بیش از ۷۵ محصول واقعی، ۱۵۰ سفارش، ۱۲۸ نظر و ۸۰ مشتری.
+- **ذخیره‌سازی تصاویر در Supabase Storage:** باکت عمومی `product-images` برای آپلود و میزبانی مستقیم عکس‌های محصولات.
+
+### 📊 داشبورد تحلیلی و چارت‌های زنده
+
+- **نمودارهای درآمد و فروش:** چارت‌های تعاملی Area و Line با امکان تغییر بازه زمانی (۷ روزه، ۳۰ روزه، ۹۰ روزه، ۱۲ ماهه).
+- **سیستم لنگرگاهی تاریخ (Rolling Anchor):** الگوریتم هوشمند در `sbApi.js` که با گذشت زمان، تاریخ سفارش‌ها را خودکار به «امروز» منتقل می‌کند تا نمودارها هیچ‌گاه خط صاف نشوند.
+
+### 📐 طراحی کاملاً پاسخ‌گو (Mobile First Responsive)
+
+- **بدون اسکرول افقی در موبایل:** طراحی جداول محصولات، دسته‌ها، نظرات و کوپن‌ها به گونه‌ای که تمام ستون‌های فرعی در موبایل مخفی شده و صفحه هرگز اسکرول افقی نخورد.
+- **مودال‌های پاسخ‌گو:** تنظیم ارتفاع استاندارد و اسکرول داخلی مودال‌ها جهت نمایش صحیح در صفحه‌نمایش‌های کوچک.
+
+### 🎭 مجموعه تست‌های اتوماتیک E2E با Playwright
+
+- **دارای ۴۶ تست مرورگر اتوماتیک:** تست جامع سناریوهای لاگین، خروج، محافظت از مسیرها، بارگذاری ۱۳ صفحه، فرمت قیمت‌ها و ریسپانسو بودن در دسکتاپ و موبایل.
+
+---
+
+## 🛠️ تکنولوژی‌های استفاده‌شده (Tech Stack)
+
+| بخش                | تکنولوژی / کتابخانه       | توضیحات                                                     |
+| ------------------ | ------------------------- | ----------------------------------------------------------- |
+| **فریم‌ورک اصلی**  | Next.js 16.3 (App Router) | رندرینگ مدرن، Server Components (RSC)، سیستم routing جدید   |
+| **کتابخانه UI**    | React 19                  | جدیدترین نسخه ری‌اکت با پشتیبانی کامل از RSC                |
+| **دیتابیس و Auth** | Supabase (@supabase/ssr)  | PostgreSQL ابری، Authentication با کوکی، Storage عمومی      |
+| **استایل‌دهی**     | Tailwind CSS v4           | فریم‌ورک استایل‌دهی توکار با متغیرهای اختصاصی تم تاریک/روشن |
+| **مدیریت استیت**   | Redux Toolkit v2          | مدیریت استیت‌های کلاینت (تم، زبان، اعلان‌ها، کاربر)         |
+| **نمودارها**       | Recharts                  | چارت‌های تعاملی و بهینه‌شده                                 |
+| **اسلایدر گالری**  | Swiper 14                 | اسلایدر عکس محصولات با پشتیبانی از دکمه‌های RTL             |
+| **تست اتوماتیک**   | Playwright E2E            | تست اتوماتیک مرورگر در نمایشگرهای مختلف                     |
+
+---
+
+## 🔑 مشخصات ورود به حساب دمو (Demo Credentials)
+
+برای تست و بررسی پروژه می‌توانید از مشخصات زیر در صفحه `/login` استفاده کنید (اطلاعات به صورت خودکار در فرم قرار دارند):
+
+- **ایمیل:** `amir.rezazadeh@nexora.com`
+- **رمز عبور:** `nexora2026`
+
+---
+
+## 💻 راهنمای نصب و اجرای لوکال
+
+### پیش‌نیازها
+
+- **Node.js 18.17+** (پیشنهاد می‌شود Node.js 20 یا 22)
+- **npm** یا **pnpm**
+
+### ۱. کلون کردن پروژه و نصب وابستگی‌ها
 
 ```bash
-npm install      # first time only
-npm run dev      # → http://localhost:3000
+git clone https://github.com/your-username/nexora-admin.git
+cd nexora-admin
+npm install
 ```
 
-Copy `.env.local` (gitignored) with:
+### ۲. تنظیم متغیرهای محیطی (`.env.local`)
 
-```
-NEXT_PUBLIC_SUPABASE_URL=https://YOUR_PROJECT.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=YOUR_PUBLISHABLE_KEY
+یک فایل به نام `.env.local` در ریشه پروژه بسازید و متغیرهای Supabase خود را قرار دهید:
+
+```env
+NEXT_PUBLIC_SUPABASE_URL=https://akqrnvrgsnofnhrhlxow.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=sb_publishable_aNo4PzSif8eS7OKLwv6Z4g_dfBBCXxG
 ```
 
-Sign in at `/login` with **sarah@novastore.com** / **nova2026**.
-Unauthenticated users are redirected to login. Row Level Security on Supabase
-returns empty arrays until a valid session JWT is present.
+### ۳. اجرای محیط توسعه (Development)
+
+در سیستم‌عامل ویندوز برای اجرا با موتور Webpack دستور زیر را بزنید:
+
+```bash
+npm run dev
+```
+
+برنامه در آدرس `http://localhost:3000` در دسترس خواهد بود.
+
+### ۴. ساخت بیلد پروداکشن (Production Build)
+
+```bash
+npm run build
+npm run start
+```
+
+### ۵. اجرای تست‌های اتوماتیک Playwright
+
+```bash
+# اجرای تمام ۴۶ تست در حالت headless
+npm run test:e2e
+
+# اجرای تست‌ها با رابط کاربری تعاملی
+npx playwright test --ui
+
+# دیدن گزارش HTML تست‌ها
+npx playwright show-report
+```
 
 ---
 
-## What's inside
+## 📂 ساختار پوشه‌های پروژه
 
-| Area | Routes |
-| --- | --- |
-| Auth | `/login`, `/forgot-password`, `/reset-password` |
-| Overview | `/` (Dashboard), `/analytics` |
-| Catalog | `/products`, `/products/new`, `/products/[id]`, `/products/[id]/edit`, `/categories`, `/inventory` |
-| Sales | `/orders`, `/orders/[id]`, `/customers`, `/customers/[id]` |
-| Marketing | `/coupons`, `/reviews` |
-| System | `/notifications`, `/settings` (8 panels), `/profile`, `/support` |
-| Errors | `404`, `/403`, `/500` |
+```text
+nexora-admin/
+├── public/                # فایل‌های ایستا، آیکون‌ها و لوگوهای برند
+│   └── brand/             # تصاویر برند و پیش‌نمایش دمو (nexora-demo.png)
+├── src/
+│   ├── app/               # صفحات و مسیرهای Next.js App Router (RSC & Client Pages)
+│   │   ├── (auth)/        # login, forgot-password, reset-password
+│   │   ├── products/      # لیست محصولات، جزئیات (/products/[id])، افزودن و ویرایش
+│   │   ├── orders/        # سفارشات و جزئیات سفارش (/orders/[id])
+│   │   ├── customers/     # مشتریان و پروفایل خریدار (/customers/[id])
+│   │   ├── categories/    # دسته‌بندی‌ها
+│   │   ├── analytics/     # گزارش‌ها و تحلیل‌های مالی
+│   │   └── settings/      # تنظیمات فروشگاه، پرداخت، ارسال، امنیت و ظاهری
+│   ├── components/        # کامپوننت‌های reusable
+│   │   ├── ui/            # Button, Input, Modal, Table, Badge, Card, StatCard, ...
+│   │   ├── charts/        # RevenueChart, SalesChart, CategoryChart, ...
+│   │   └── layout/        # AppShell, Header, Sidebar, SettingsLayout, Toaster
+│   ├── i18n/              # دیکشنری‌های ترجمه فارسی/انگلیسی (messages.js, extra.js, server.js)
+│   ├── lib/               # توابع کمکی، supabaseClient, supabaseServer, sbApi, format
+│   └── store/             # اسلایس‌های Redux Toolkit (auth, ui, theme, notifications)
+├── tests/                 # تست‌های اتوماتیک E2E با Playwright
+│   ├── auth.spec.js
+│   ├── navigation.spec.js
+│   ├── products.spec.js
+│   └── responsive.spec.js
+├── middleware.js          # احراز هویت سرور-ساید با کوکی‌ها (@supabase/ssr)
+├── playwright.config.js   # کانفیگ Playwright
+└── next.config.js         # کانفیگ بهینه‌سازی Next.js
+```
 
 ---
 
-## Architecture
+## 👨‍💻 توسعه‌دهنده
 
-```
-src/
-├─ app/                 Routes (App Router pages only)
-├─ components/
-│  ├─ ui/               Reusable primitives (Button, Table, Modal, …)
-│  ├─ layout/           Shell: Sidebar, Header, GlobalSearch, ThemeProvider
-│  ├─ charts/           Recharts wrappers with shared theming + tooltip
-│  ├─ dashboard/        KPI widgets, RecentOrders, TopProducts, LowStock, Activity
-│  └─ products/         ProductTable, ProductFilters, ProductForm, Gallery, Variants
-├─ store/               Redux Toolkit store + 9 slices
-├─ lib/                 Supabase client, API adapter, mappers, formatters, hooks
-└─ i18n/                EN / FA messages + RTL
-```
-
-```
-page / slice
-  → api('/api/products')     src/lib/api.js   (stable REST-shaped contract)
-  → handleRemote(...)        src/lib/sbApi.js (Supabase queries + aggregates)
-  → supabase-js              src/lib/supabaseClient.js
-  → Postgres + Storage
-```
-
-UI talks camelCase (`nameFa`, `categoryId`). Postgres is snake_case
-(`name_fa`, `category_id`). `src/lib/maps.js` is the boundary.
-
-### Data
-
-Live data lives in Supabase, not in the repo:
-
-- ~50 products (`prd-1001` …) with public images in the `product-images` bucket
-- 9 categories, ~80 customers, ~150 orders, 8 coupons, ~300 reviews
-- Inventory is a **view** over `products` (stock 0 = out, 1–8 = low)
-- Auth user: `sarah@novastore.com` — schema/seed SQL is under `supabase/`
-
-Dashboard “today” is fixed at `2026-08-21T12:00:00Z` so historical seed
-windows are not all zeros. Revenue counts pending, processing, shipped and
-delivered (not cancelled/refunded).
-
-### Redux Toolkit
-
-Nine slices for state that is genuinely shared: `products`, `orders`,
-`customers`, `categories`, `inventory`, `notifications`, `auth`, `ui`, `theme`.
-Each list slice owns its filters, sort, page, selection and column visibility,
-with async thunks reading the current slice state so a filter change
-automatically refetches.
-
-Local UI state stays local by design — dropdown open/closed, hover, draft form
-values and modal visibility are all `useState`. The one deliberate exception is
-`ui.pageTitle`: detail pages publish their resolved title so the header
-breadcrumb can show a product name instead of a raw id.
+طراحی و توسعه‌یافته توسط **امیر رضازاده**  
+پروژه پورتفولیو و نمونه‌کار سطح بالا برای ارزیابی مهارت‌های فرانت‌اند و فول‌استک با Next.js و Supabase.
 
 ---
 
-## Design system
-
-**Tokens.** Every colour is a CSS custom property consumed through semantic
-Tailwind names (`surface`, `ink-2`, `brand-soft`, `danger-text`). Nothing
-references a raw hex in a component, which is what makes the dark theme a
-separate designed palette rather than an inversion — dark re-tunes the orange
-lighter and less saturated so it holds contrast on dark surfaces, and gives
-tables, badges, inputs and charts their own values.
-
-**Type scale.** Display / H1–H4 / Body Large / Body / Body Small / Caption /
-Label / Micro, on Inter (Vazirmatn when `fa`) with tabular numerals wherever
-figures are compared.
-
-**Spacing** 4→64 · **Radius** controls 8–10, cards 12–16, containers 20, pills 999
-· **Shadows** reserved for dropdowns, popovers, modals and toasts.
-
-**Orange is an accent**, not a surface: primary CTAs, active navigation,
-selection, focus rings, progress and trend accents.
-
-### Notable UI decisions
-
-- **Tables** right-align and tabular-align every numeric column, use horizontal
-  rules only, sticky identity and action columns during horizontal scroll, and
-  swap the toolbar for a bulk-action bar the moment rows are selected.
-- **Status is never colour alone** — every dot ships with its label
-  (`● Low stock`), so meaning survives greyscale.
-- **Filters** live in a drawer, are staged locally and applied on confirm, and
-  every active filter is echoed as a removable chip above the table.
-- **Complex forms are full pages**, with a sticky save bar, an error summary,
-  inline field messages, preserved values after failed validation, and sections
-  that become collapsible accordions on mobile.
-- **Charts** are chosen for the data: area for revenue trend, dual-axis bars +
-  line for orders vs units, donut for category share, stacked bars for new vs
-  returning customers, horizontal bars for product ranking.
-
-### States
-
-Every data-driven surface implements loading, success, empty and error.
-Skeletons mirror the real layout (KPI cards, tables, lists, charts); spinners
-are reserved for short actions like Saving… and Deleting…. Empty states
-distinguish "nothing yet" from "nothing matches your filters" and offer the
-right next action for each.
-
-### Accessibility
-
-Semantic HTML and landmarks, a skip link, keyboard-operable menus with roving
-arrow navigation, focus trapping and restoration in modals and drawers, visible
-focus rings throughout, `aria-sort` on sortable headers, accessible names on
-every icon button, `sr-only` table captions, live regions for toasts, and
-`prefers-reduced-motion` honoured globally.
-
-### Responsive
-
-Not a shrunk desktop. The sidebar collapses to icons with tooltips and becomes a
-drawer on mobile; KPI cards go two-up with a tighter type scale and no sparkline;
-filters become a bottom sheet; tables scroll horizontally with sticky columns;
-the product form collapses into accordions; and the order status timeline flips
-from horizontal to vertical.
-
----
-
-## Keyboard
-
-| Shortcut | Action |
-| --- | --- |
-| `⌘K` / `Ctrl+K` | Open global search |
-| `↑` `↓` | Move through results |
-| `Enter` | Open the highlighted result |
-| `Esc` | Close any dialog, drawer or menu |
-
----
-
-## Notes
-
-Product images are served from Supabase Storage. Payment provider settings are
-UI-only — no credentials are stored or transmitted, and nothing processes a
-real transaction. Free-tier Supabase pauses after about a week of idle
-database traffic; restore from the dashboard if queries hang.
+<div align="center">
+  <sub>Nexora Admin — Built with precision, performance, and attention to detail.</sub>
+</div>
