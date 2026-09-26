@@ -1,12 +1,11 @@
 <div align="center">
 
-# 🛍️ Nexora Admin
+# <img width="40" height="40" align="center" src="./public/brand/nexora-mark.webp" alt="Nexora logo" width="520" /> Nexora Admin
 
 ### داشبورد مدیریت پیشرفته و حرفه‌ای فروشگاه اینترنتی
 
-[**🌐 مشاهده دمو زنده (Vercel)**](https://nexora-admin-app.vercel.app/) • [**📦 مخزن گیت‌هاب**](#) • [**⚡ گزارش کارایی**](#-کارایی-و-سرعت-lighthouse-97100)
-
-  <br />
+[**🌐 مشاهده دمو زنده (Vercel)**](https://nexora-admin-app.vercel.app/)
+<br />
 
 ![Next.js](https://img.shields.io/badge/Next.js_16-000000?style=for-the-badge&logo=nextdotjs&logoColor=white)
 ![React](https://img.shields.io/badge/React_19-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
@@ -25,7 +24,8 @@
 
 ## 📌 معرفی پروژه
 
-**Nexora Admin** یک پنل مدیریت (Admin Dashboard) کامل، پرسرعت، مدرن و حرفه‌ای برای فروشگاه‌های اینترنتی است که با استفاده از آخرین فریم‌ورک‌ها و تکنولوژی‌های وب شامل **Next.js 16 (App Router)**، **React 19**، **Supabase (PostgreSQL + Auth + Storage)** و **Tailwind CSS v4** طراحی و پیاده‌سازی شده است.
+**Nexora Admin**
+یک پنل مدیریت (Admin Dashboard) کامل، پرسرعت، مدرن و حرفه‌ای برای فروشگاه‌های اینترنتی است که با استفاده از آخرین فریم‌ورک‌ها و تکنولوژی‌های وب شامل **Next.js 16 (App Router)**، **React 19**، **Supabase (PostgreSQL + Auth + Storage)** و **Tailwind CSS v4** طراحی و پیاده‌سازی شده است.
 
 این پروژه تمامی بخش‌های کلیدی یک فروشگاه اینترنتی واقعی را پوشش می‌دهد: مدیریت کاتالوگ محصولات، دسته‌بندی‌ها، انبارداری، سفارشات، مشتریان، کدهای تخفیف، نظرات خریداران، گزارش‌های مالی و تحلیلی.
 
