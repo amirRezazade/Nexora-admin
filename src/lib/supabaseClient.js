@@ -1,4 +1,4 @@
-import { createBrowserClient } from '@supabase/ssr';
+import { createBrowserClient } from "@supabase/ssr";
 
 /**
  * Browser Supabase client.
@@ -8,10 +8,7 @@ import { createBrowserClient } from '@supabase/ssr';
  * server and protect routes with a real redirect before any JS renders.
  * Token refresh and URL-based recovery links keep working automatically.
  */
-const url = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://akqrnvrgsnofnhrhlxow.supabase.co';
-const key =
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
-  'sb_publishable_aNo4PzSif8eS7OKLwv6Z4g_dfBBCXxG';
+import { SUPABASE_URL as url, SUPABASE_ANON_KEY as key } from "./env";
 
 export const supabase = createBrowserClient(url, key, {
   auth: {

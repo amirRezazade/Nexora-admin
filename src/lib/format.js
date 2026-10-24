@@ -19,10 +19,6 @@ let formatLocale = readStoredLocale();
 export function setFormatLocale(l) {
   formatLocale = l === "fa" ? "fa" : "en";
 }
-export function getFormatLocale() {
-  return formatLocale;
-}
-
 const intlLocale = () => (formatLocale === "fa" ? "fa-IR" : "en-US");
 
 /** Convert ASCII digits in a string to the active locale’s digits. */
@@ -80,8 +76,6 @@ export const percent = (n, digitsCount = 1) => {
 
 export const dateShort = (d) => new Date(d).toLocaleDateString(intlLocale(), { month: "short", day: "numeric", year: "numeric" });
 
-export const dateMedium = (d) => new Date(d).toLocaleDateString(intlLocale(), { month: "short", day: "numeric", year: "numeric" });
-
 export const dateTime = (d) =>
   new Date(d).toLocaleString(intlLocale(), {
     month: "short",
@@ -90,8 +84,6 @@ export const dateTime = (d) =>
     hour: "numeric",
     minute: "2-digit",
   });
-
-export const timeOnly = (d) => new Date(d).toLocaleTimeString(intlLocale(), { hour: "numeric", minute: "2-digit" });
 
 export function relativeTime(d) {
   const diff = Date.now() - new Date(d).getTime();

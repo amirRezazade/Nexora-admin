@@ -1,22 +1,16 @@
-import { cn } from '@/lib/format';
+import { cn } from "@/lib/format";
 
-export default function Card({ className, children, as: Tag = 'div', padded = false, ...props }) {
+export default function Card({ className, children, as: Tag = "div", padded = false, ...props }) {
   return (
-    <Tag className={cn('card overflow-hidden', padded && 'p-5 sm:p-6', className)} {...props}>
+    <Tag className={cn("card overflow-hidden", padded && "p-5 sm:p-6", className)} {...props}>
       {children}
     </Tag>
   );
 }
 
-export function CardHeader({ title, description, action, className, titleAs: Title = 'h2', border = true, icon: Icon }) {
+export function CardHeader({ title, description, action, className, titleAs: Title = "h2", border = true, icon: Icon }) {
   return (
-    <div
-      className={cn(
-        'flex flex-wrap items-start justify-between gap-3 px-5 py-4 sm:px-6',
-        border && 'border-b border-line',
-        className
-      )}
-    >
+    <div className={cn("flex flex-wrap items-start justify-between gap-3 px-5 py-4 sm:px-6", border && "border-b border-line", className)}>
       <div className="flex min-w-0 items-start gap-2.5">
         {Icon && (
           <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-control bg-surface-3">
@@ -34,13 +28,5 @@ export function CardHeader({ title, description, action, className, titleAs: Tit
 }
 
 export function CardBody({ className, children }) {
-  return <div className={cn('px-5 py-5 sm:px-6', className)}>{children}</div>;
-}
-
-export function CardFooter({ className, children }) {
-  return (
-    <div className={cn('flex items-center justify-between gap-3 border-t border-line bg-surface-2 px-5 py-3 sm:px-6', className)}>
-      {children}
-    </div>
-  );
+  return <div className={cn("px-5 py-5 sm:px-6", className)}>{children}</div>;
 }

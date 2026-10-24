@@ -1,4 +1,5 @@
-import { Inter, Vazirmatn } from "next/font/google";
+import { Inter } from "next/font/google";
+import localFont from "next/font/local";
 import "./globals.css";
 import StoreProvider from "@/store/Provider";
 import ThemeProvider, { themeScript } from "@/components/layout/ThemeProvider";
@@ -12,8 +13,11 @@ const inter = Inter({
   display: "swap",
 });
 
-const vazirmatn = Vazirmatn({
-  subsets: ["arabic", "latin"],
+/* Vazirmatn variable font (weights 100-900), served from /fonts.
+   Source: github.com/rastikerdar/vazirmatn (OFL licence). */
+const vazirmatn = localFont({
+  src: "../../fonts/Vazirmatn-Variable.ttf",
+  weight: "100 900",
   variable: "--font-vazirmatn",
   display: "swap",
 });

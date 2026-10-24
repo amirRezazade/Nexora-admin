@@ -326,6 +326,11 @@ export const extra = {
       last30: "Last 30 days",
       last90: "Last 90 days",
       last12: "Last 12 months",
+      colProduct: "Product",
+      colUnits: "Units",
+      colOrders: "Orders",
+      colRevenue: "Revenue",
+      colShare: "Share",
     },
     couponsPage: {
       title: "Coupons",

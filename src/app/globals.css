@@ -142,11 +142,22 @@
     scroll-margin: 0;
   }
 
+  /* Hide the browser's built-in clear (×) on search fields; the page keeps its own controls. */
+  input[type="search"]::-webkit-search-cancel-button,
+  input[type="search"]::-webkit-search-decoration {
+    -webkit-appearance: none;
+    appearance: none;
+    display: none;
+  }
   html[data-locale="fa"],
   html[dir="rtl"] {
-    --font-sans: "Vazirmatn", "Inter", ui-sans-serif, system-ui, sans-serif;
+    --font-sans: var(--font-vazirmatn), "Vazirmatn", var(--font-inter), "Inter", ui-sans-serif, system-ui, sans-serif;
   }
 
+  /* Inter's stylistic sets must not reshape Persian glyphs and digits. */
+  html[dir="rtl"] body {
+    font-feature-settings: normal;
+  }
   body {
     background-color: rgb(var(--c-canvas));
     color: rgb(var(--c-ink));

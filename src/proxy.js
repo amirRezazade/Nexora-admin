@@ -1,5 +1,6 @@
-import { NextResponse } from 'next/server';
-import { createServerClient } from '@supabase/ssr';
+import { NextResponse } from "next/server";
+import { createServerClient } from "@supabase/ssr";
+import { SUPABASE_URL, SUPABASE_ANON_KEY } from "./lib/env";
 
 /**
  * Server-side route protection.
@@ -12,18 +13,12 @@ import { createServerClient } from '@supabase/ssr';
  * one that guarantees a signed-out visitor never sees admin content flash.
  */
 
-const PUBLIC_ROUTES = ['/login', '/forgot-password', '/reset-password'];
+const PUBLIC_ROUTES = ["/login", "/forgot-password", "/reset-password"];
 
-const SUPABASE_URL =
-  process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://akqrnvrgsnofnhrhlxow.supabase.co';
-const SUPABASE_KEY =
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
-  'sb_publishable_aNo4PzSif8eS7OKLwv6Z4g_dfBBCXxG';
-
-export async function middleware(request) {
+export async function proxy(request) {
   let response = NextResponse.next({ request });
 
-  const supabase = createServerClient(SUPABASE_URL, SUPABASE_KEY, {
+  const supabase = createServerClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
     cookies: {
       getAll() {
         return request.cookies.getAll();
@@ -31,9 +26,7 @@ export async function middleware(request) {
       setAll(cookiesToSet) {
         cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value));
         response = NextResponse.next({ request });
-        cookiesToSet.forEach(({ name, value, options }) =>
-          response.cookies.set(name, value, options)
-        );
+        cookiesToSet.forEach(({ name, value, options }) => response.cookies.set(name, value, options));
       },
     },
   });
@@ -49,13 +42,13 @@ export async function middleware(request) {
 
   if (!user && !isPublic) {
     const url = request.nextUrl.clone();
-    url.pathname = '/login';
+    url.pathname = "/login";
     return NextResponse.redirect(url);
   }
 
-  if (user && path === '/login') {
+  if (user && path === "/login") {
     const url = request.nextUrl.clone();
-    url.pathname = '/';
+    url.pathname = "/";
     return NextResponse.redirect(url);
   }
 
@@ -67,7 +60,5 @@ export const config = {
    * Everything except Next internals and static files. Charts, CSS and images
    * must stay reachable without a session.
    */
-  matcher: [
-    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico|xml|txt|css|js|json|map|woff|woff2)$).*)',
-  ],
+  matcher: ["/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico|xml|txt|css|js|json|map|woff|woff2)$).*)"],
 };

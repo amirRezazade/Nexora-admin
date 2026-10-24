@@ -161,7 +161,7 @@ function productPerformance(orders, products, days = 30) {
       cur.revenue = Math.round((cur.revenue + it.total) * 100) / 100;
       cur.orders += 1;
       map.set(it.productId, cur);
-    }),
+    })
   );
   return [...map.values()]
     .map((row) => {
@@ -271,46 +271,119 @@ async function expandCategoryIds(rawIds, cats) {
   return [...ids];
 }
 
+/* ---------- Products: server-side query, filter, sort, pagination ----------
+ * All list work happens in Postgres. The browser only asks for one page.
+ * Filters become SQL conditions (.eq / .in / .gte / .or), sorting becomes
+ * ORDER BY, and pagination becomes LIMIT/OFFSET via .range(). The total comes
+ * from count: 'exact', so the UI still knows how many pages exist.
+ */
+const PRODUCT_SORT_COLUMNS = {
+  name: "name",
+  sku: "sku",
+  categoryId: "category_id",
+  price: "price",
+  stock: "stock",
+  createdAt: "created_at",
+  updatedAt: "updated_at",
+};
+const LOW_STOCK_MAX = 8; // must match stockStatus() in maps.js
+
+/** Reads a multi-value param such as ?status=active,draft (or repeated keys). */
+function listParam(params, key) {
+  return params
+    .getAll(key)
+    .flatMap((v) => String(v).split(","))
+    .map((v) => v.trim())
+    .filter((v) => v && v !== "all");
+}
+
+/** One search token matches any of the text columns. Characters that have a
+ *  meaning inside PostgREST's or() syntax are stripped from user input. */
+function searchOr(token) {
+  const t = token.replace(/[%_*,()\\]/g, " ").trim();
+  if (!t) return null;
+  return `name.ilike.*${t}*,name_fa.ilike.*${t}*,sku.ilike.*${t}*,brand.ilike.*${t}*`;
+}
+
+/** in_stock = more than 8, low_stock = 1..8, out_of_stock = 0 or less. */
+function stockOr(values) {
+  const parts = [];
+  if (values.includes("in_stock")) parts.push(`stock.gt.${LOW_STOCK_MAX}`);
+  if (values.includes("low_stock")) parts.push(`and(stock.gt.0,stock.lte.${LOW_STOCK_MAX})`);
+  if (values.includes("out_of_stock")) parts.push("stock.lte.0");
+  return parts.length ? parts.join(",") : null;
+}
+
+async function countProducts(build) {
+  const { count, error } = await build(supabase.from("products").select("id", { count: "exact", head: true }));
+  if (error) throw new ApiError(error.message);
+  return count ?? 0;
+}
+
+/** Tab and badge counts. Each one is a cheap HEAD request that returns only a count. */
+async function productSummary() {
+  const [total, active, draft, archived, lowStock, outOfStock] = await Promise.all([countProducts((q) => q), countProducts((q) => q.eq("status", "active")), countProducts((q) => q.eq("status", "draft")), countProducts((q) => q.eq("status", "archived")), countProducts((q) => q.gt("stock", 0).lte("stock", LOW_STOCK_MAX)), countProducts((q) => q.lte("stock", 0))]);
+  return { total, active, draft, archived, lowStock, outOfStock };
+}
+
 async function getProducts(params) {
   if (params.get("fail") === "1") throw new ApiError("Upstream catalog service is unavailable.", 500);
-  let rows = await allProducts();
-  const minPrice = parseFloat(params.get("minPrice"));
-  const maxPrice = parseFloat(params.get("maxPrice"));
-  if (!Number.isNaN(minPrice)) rows = rows.filter((r) => r.price >= minPrice);
-  if (!Number.isNaN(maxPrice)) rows = rows.filter((r) => r.price <= maxPrice);
-  const addedAfter = params.get("addedAfter");
-  if (addedAfter) rows = rows.filter((r) => new Date(r.createdAt) >= new Date(addedAfter));
-  const rawCats = params
-    .getAll("category")
-    .flatMap((v) => String(v).split(","))
-    .filter((v) => v && v !== "all");
+
+  const page = Math.max(1, parseInt(params.get("page") || "1", 10));
+  const pageSize = Math.min(200, Math.max(1, parseInt(params.get("pageSize") || "10", 10)));
+  const from = (page - 1) * pageSize;
+  const to = from + pageSize - 1;
+
+  let query = supabase.from("products").select("*", { count: "exact" });
+
+  // search: every token must match at least one text column (AND across tokens)
+  (params.get("q") || "")
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean)
+    .forEach((token) => {
+      const expr = searchOr(token);
+      if (expr) query = query.or(expr);
+    });
+
+  const statuses = listParam(params, "status");
+  if (statuses.length) query = query.in("status", statuses);
+
+  const stockExpr = stockOr(listParam(params, "stock"));
+  if (stockExpr) query = query.or(stockExpr);
+
+  const rawCats = listParam(params, "category");
   if (rawCats.length) {
+    // a parent category also includes its children
     const cats = await allCategories();
-    const expanded = await expandCategoryIds(rawCats, cats);
-    params = new URLSearchParams(params);
-    params.delete("category");
-    params.set("category", expanded.join(","));
+    const ids = await expandCategoryIds(rawCats, cats);
+    query = query.in("category_id", ids);
   }
-  const result = queryList(rows, params, {
-    searchFields: ["name", "nameFa", "sku", "brand"],
-    filters: {
-      category: (row, values) => values.includes(row.categoryId),
-      status: (row, values) => values.includes(row.status),
-      stock: (row, values) => values.includes(row.stockStatus),
-    },
-    defaultSort: { key: "updatedAt", dir: "desc" },
-  });
-  const all = rows === undefined ? [] : await allProducts();
+
+  const minPrice = parseFloat(params.get("minPrice"));
+  if (!Number.isNaN(minPrice)) query = query.gte("price", minPrice);
+  const maxPrice = parseFloat(params.get("maxPrice"));
+  if (!Number.isNaN(maxPrice)) query = query.lte("price", maxPrice);
+
+  const addedAfter = params.get("addedAfter");
+  if (addedAfter) query = query.gte("created_at", addedAfter);
+
+  // sort; the id tie-breaker keeps pages stable when values are equal
+  const sortCol = PRODUCT_SORT_COLUMNS[params.get("sort")] || PRODUCT_SORT_COLUMNS.updatedAt;
+  const ascending = (params.get("dir") || "desc") === "asc";
+  query = query.order(sortCol, { ascending, nullsFirst: false }).order("id", { ascending: true });
+
+  const { data, error, count } = await query.range(from, to);
+  if (error) throw new ApiError(error.message, 400);
+
+  const total = count ?? 0;
   return {
-    ...result,
-    summary: {
-      total: all.length,
-      active: all.filter((p) => p.status === "active").length,
-      draft: all.filter((p) => p.status === "draft").length,
-      archived: all.filter((p) => p.status === "archived").length,
-      lowStock: all.filter((p) => p.stockStatus === "low_stock").length,
-      outOfStock: all.filter((p) => p.stockStatus === "out_of_stock").length,
-    },
+    data: (data || []).map(mapProduct),
+    total,
+    page,
+    pageSize,
+    totalPages: Math.max(1, Math.ceil(total / pageSize)),
+    summary: await productSummary(),
   };
 }
 
@@ -465,30 +538,206 @@ async function deleteCategory(id) {
   return { ok: true, id };
 }
 
+/* ---------- Shared helpers for server-side lists ---------- */
+
+/** Rolling "now" shift used by the demo data (see shiftToNow). The stored dates
+ *  are older than today, so the UI moves every date forward by the same amount.
+ *  The server must apply the same offset so filters on dates still match what
+ *  the user sees. Returns 0 when no shift is needed. */
+async function rollingShiftMs(table, column) {
+  const { data, error } = await supabase.from(table).select(column).order(column, { ascending: false }).limit(1);
+  if (error || !data?.length || !data[0][column]) return 0;
+  const diff = Date.now() - new Date(data[0][column]).getTime();
+  return diff > 12 * 3600 * 1000 ? diff : 0;
+}
+const shiftIso = (iso, ms) => (ms && iso ? new Date(new Date(iso).getTime() + ms).toISOString() : iso);
+const unshiftIso = (iso, ms) => (ms && iso ? new Date(new Date(iso).getTime() - ms).toISOString() : iso);
+
+/** Splits the search box into tokens. Each token must match at least one column. */
+function applyTokenSearch(query, q, columns) {
+  String(q || "")
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean)
+    .forEach((token) => {
+      const t = token.replace(/[%_*,()\\]/g, " ").trim();
+      if (!t) return;
+      query = query.or(columns.map((c) => `${c}.ilike.*${t}*`).join(","));
+    });
+  return query;
+}
+
+/** Applies ORDER BY from a UI sort key. Unknown keys fall back to `fallback`. */
+function applySort(query, sortMap, key, dir, fallback) {
+  const col = sortMap[key] || sortMap[fallback];
+  const ascending = dir === "asc";
+  return query.order(col, { ascending, nullsFirst: false }).order("id", { ascending: true });
+}
+
+function pageWindow(params) {
+  const page = Math.max(1, parseInt(params.get("page") || "1", 10));
+  const pageSize = Math.min(200, Math.max(1, parseInt(params.get("pageSize") || "10", 10)));
+  const from = (page - 1) * pageSize;
+  return { page, pageSize, from, to: from + pageSize - 1 };
+}
+
+function pageResult(rows, count, page, pageSize) {
+  const total = count ?? 0;
+  return { data: rows, total, page, pageSize, totalPages: Math.max(1, Math.ceil(total / pageSize)) };
+}
+
+/* ---------- Orders ---------- */
+
+const ORDER_SORT_COLUMNS = {
+  id: "id",
+  placedAt: "placed_at",
+  customerName: "customer_name",
+  itemCount: "item_count",
+  total: "total",
+  status: "status",
+  paymentStatus: "payment_status",
+};
+
 async function getOrders(params) {
-  let rows = await allOrders();
-  const from = params.get("from");
-  const to = params.get("to");
-  if (from) rows = rows.filter((o) => new Date(o.placedAt) >= new Date(from));
-  if (to) rows = rows.filter((o) => new Date(o.placedAt) <= new Date(to));
+  const { page, pageSize, from, to } = pageWindow(params);
+  const shift = await rollingShiftMs("orders", "placed_at");
+
+  let query = supabase.from("orders").select("*", { count: "exact" });
+  query = applyTokenSearch(query, params.get("q"), ["id", "customer_name", "customer_email", "tracking_number"]);
+
+  const statuses = listParam(params, "status");
+  if (statuses.length) query = query.in("status", statuses);
+  const payments = listParam(params, "payment");
+  if (payments.length) query = query.in("payment_status", payments);
+  const customerIds = listParam(params, "customerId");
+  if (customerIds.length) query = query.in("customer_id", customerIds);
+
+  const fromDate = params.get("from");
+  if (fromDate) query = query.gte("placed_at", unshiftIso(new Date(fromDate).toISOString(), shift));
+  const toDate = params.get("to");
+  if (toDate) query = query.lte("placed_at", unshiftIso(new Date(toDate).toISOString(), shift));
   const minTotal = parseFloat(params.get("minTotal"));
-  if (!Number.isNaN(minTotal)) rows = rows.filter((o) => o.total >= minTotal);
-  const result = queryList(rows, params, {
-    searchFields: ["id", "customerName", "customerEmail", "trackingNumber"],
-    filters: {
-      status: (row, values) => values.includes(row.status),
-      payment: (row, values) => values.includes(row.paymentStatus),
-      customerId: (row, values) => values.includes(row.customerId),
-    },
-    defaultSort: { key: "placedAt", dir: "desc" },
+  if (!Number.isNaN(minTotal)) query = query.gte("total", minTotal);
+
+  query = applySort(query, ORDER_SORT_COLUMNS, params.get("sort"), params.get("dir") || "desc", "placedAt");
+  const { data, error, count } = await query.range(from, to);
+  if (error) throw new ApiError(error.message, 400);
+
+  const ids = (data || []).map((o) => o.id);
+  let itemsByOrder = new Map();
+  if (ids.length) {
+    const { data: itemRows, error: itemErr } = await supabase.from("order_items").select("*").in("order_id", ids);
+    if (itemErr) throw new ApiError(itemErr.message);
+    (itemRows || []).map(mapOrderItem).forEach((it) => {
+      const key = it.orderId || it.order_id;
+      itemsByOrder.set(key, [...(itemsByOrder.get(key) || []), it]);
+    });
+  }
+  const rows = (data || []).map((o) => {
+    const mapped = mapOrder(o, itemsByOrder.get(o.id) || []);
+    return { ...mapped, placedAt: shiftIso(mapped.placedAt, shift) };
   });
-  const all = await allOrders();
-  const counts = all.reduce((acc, o) => {
+
+  // Tab counts ignore the filters. Only the status column is read, which is small.
+  const { data: statusRows, error: statusErr } = await supabase.from("orders").select("status");
+  if (statusErr) throw new ApiError(statusErr.message);
+  const counts = (statusRows || []).reduce((acc, o) => {
     acc[o.status] = (acc[o.status] || 0) + 1;
     return acc;
   }, {});
+  counts.all = (statusRows || []).length;
+
+  return { ...pageResult(rows, count, page, pageSize), counts };
+}
+
+/* ---------- Customers ---------- */
+
+const CUSTOMER_SORT_COLUMNS = {
+  name: "name",
+  email: "email",
+  city: "city",
+  country: "country",
+  status: "status",
+  orders: "orders_count",
+  ordersCount: "orders_count",
+  totalSpent: "total_spent",
+  avgOrder: "avg_order",
+  lastOrder: "last_order",
+  joinedAt: "joined_at",
+};
+
+async function getCustomers(params) {
+  const { page, pageSize, from, to } = pageWindow(params);
+
+  let query = supabase.from("customers").select("*", { count: "exact" });
+  query = applyTokenSearch(query, params.get("q"), ["name", "email", "city", "country"]);
+  const statuses = listParam(params, "status");
+  if (statuses.length) query = query.in("status", statuses);
+  const segments = listParam(params, "segment");
+  if (segments.length) query = query.in("segment", segments);
+  const countries = listParam(params, "country");
+  if (countries.length) query = query.in("country", countries);
+
+  query = applySort(query, CUSTOMER_SORT_COLUMNS, params.get("sort"), params.get("dir") || "desc", "totalSpent");
+  const { data, error, count } = await query.range(from, to);
+  if (error) throw new ApiError(error.message, 400);
+
+  // Summary cards need every customer, but only three small columns.
+  const { data: agg, error: aggErr } = await supabase.from("customers").select("status,segment,total_spent");
+  if (aggErr) throw new ApiError(aggErr.message);
+  const all = agg || [];
+  const summary = {
+    total: all.length,
+    active: all.filter((c) => c.status === "active").length,
+    vip: all.filter((c) => c.segment === "VIP").length,
+    new: all.filter((c) => c.segment === "New").length,
+    lifetimeValue: Math.round(all.reduce((s, c) => s + (Number(c.total_spent) || 0), 0)),
+  };
+  return { ...pageResult((data || []).map(mapCustomer), count, page, pageSize), summary };
+}
+
+/* ---------- Reviews ---------- */
+
+const REVIEW_SORT_COLUMNS = {
+  createdAt: "created_at",
+  rating: "rating",
+  status: "status",
+  customerName: "customer_name",
+  productName: "product_name",
+};
+
+async function getReviews(params) {
+  const { page, pageSize, from, to } = pageWindow(params);
+  const shift = await rollingShiftMs("reviews", "created_at");
+
+  let query = supabase.from("reviews").select("*", { count: "exact" });
+  query = applyTokenSearch(query, params.get("q"), ["customer_name", "product_name", "body", "title"]);
+  const statuses = listParam(params, "status");
+  if (statuses.length) query = query.in("status", statuses);
+  const ratings = listParam(params, "rating")
+    .map(Number)
+    .filter((n) => Number.isFinite(n));
+  if (ratings.length) query = query.in("rating", ratings);
+
+  query = applySort(query, REVIEW_SORT_COLUMNS, params.get("sort"), params.get("dir") || "desc", "createdAt");
+  const { data, error, count } = await query.range(from, to);
+  if (error) throw new ApiError(error.message, 400);
+
+  const rows = (data || []).map((r) => {
+    const mapped = mapReview(r);
+    return { ...mapped, createdAt: shiftIso(mapped.createdAt, shift) };
+  });
+
+  const { data: agg, error: aggErr } = await supabase.from("reviews").select("status,rating");
+  if (aggErr) throw new ApiError(aggErr.message);
+  const all = agg || [];
+  const counts = all.reduce((acc, r) => {
+    acc[r.status] = (acc[r.status] || 0) + 1;
+    return acc;
+  }, {});
   counts.all = all.length;
-  return { ...result, counts };
+  const avg = all.reduce((s, r) => s + (Number(r.rating) || 0), 0) / (all.length || 1);
+  return { ...pageResult(rows, count, page, pageSize), counts, average: Math.round(avg * 10) / 10 };
 }
 
 function decorateItems(items, products) {
@@ -522,29 +771,6 @@ async function patchOrder(id, body) {
   return { data: mapOrder(data, items) };
 }
 
-async function getCustomers(params) {
-  const all = await allCustomers();
-  const result = queryList(all, params, {
-    searchFields: ["name", "email", "city", "country"],
-    filters: {
-      status: (row, values) => values.includes(row.status),
-      segment: (row, values) => values.includes(row.segment),
-      country: (row, values) => values.includes(row.country),
-    },
-    defaultSort: { key: "totalSpent", dir: "desc" },
-  });
-  return {
-    ...result,
-    summary: {
-      total: all.length,
-      active: all.filter((c) => c.status === "active").length,
-      vip: all.filter((c) => c.segment === "VIP").length,
-      new: all.filter((c) => c.segment === "New").length,
-      lifetimeValue: Math.round(all.reduce((s, c) => s + c.totalSpent, 0)),
-    },
-  };
-}
-
 async function getCustomer(id) {
   const { data, error } = await supabase.from("customers").select("*").eq("id", id).maybeSingle();
   if (error || !data) throw new ApiError("Customer not found.", 404);
@@ -568,7 +794,7 @@ async function getCustomer(id) {
       cur.units += it.quantity;
       cur.revenue = Math.round((cur.revenue + it.total) * 100) / 100;
       favouriteMap.set(it.productId, cur);
-    }),
+    })
   );
   const address = {
     line1: customer.addressLine1,
@@ -636,30 +862,6 @@ async function patchInventory(body) {
   if (error) throw new ApiError(error.message);
   const { data } = await supabase.from("inventory").select("*").eq("id", id).maybeSingle();
   return { data: mapInventory(data) };
-}
-
-async function getReviews(params) {
-  const { data, error } = await supabase.from("reviews").select("*").order("created_at", { ascending: false });
-  if (error) throw new ApiError(error.message);
-  let rows = shiftToNow((data || []).map(mapReview), "createdAt");
-  const rating = params
-    .getAll("rating")
-    .flatMap((v) => v.split(","))
-    .filter(Boolean);
-  if (rating.length) rows = rows.filter((r) => rating.includes(String(r.rating)));
-  const result = queryList(rows, params, {
-    searchFields: ["customerName", "productName", "body", "title"],
-    filters: { status: (row, values) => values.includes(row.status) },
-    defaultSort: { key: "createdAt", dir: "desc" },
-  });
-  const all = (data || []).map(mapReview);
-  const counts = all.reduce((acc, r) => {
-    acc[r.status] = (acc[r.status] || 0) + 1;
-    return acc;
-  }, {});
-  counts.all = all.length;
-  const avg = all.reduce((s, r) => s + r.rating, 0) / (all.length || 1);
-  return { ...result, counts, average: Math.round(avg * 10) / 10 };
 }
 
 async function patchReview(id, body) {
@@ -806,11 +1008,11 @@ async function getDashboard(params) {
     series,
     granularity: range === "12m" ? "month" : "day",
     recentOrders: orders.slice(0, 6),
-    topProducts: productPerformance(orders, products, days).slice(0, 6),
+    topProducts: productPerformance(orders, products, days).slice(0, 5),
     lowStockItems: products
       .filter((p) => p.stockStatus !== "in_stock" && p.status !== "archived")
       .sort((a, b) => a.stock - b.stock)
-      .slice(0, 7)
+      .slice(0, 5)
       .map((p) => ({ id: p.id, name: p.name, nameFa: p.nameFa, sku: p.sku, stock: p.stock, threshold: 8, status: p.stockStatus, price: p.price, image: p.image })),
     activity: orders.slice(0, 7).map((o) => ({
       id: `act-${o.id}`,
